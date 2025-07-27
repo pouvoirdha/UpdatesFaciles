@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://updatesfaciles.local/schemas/softwareapp.schema.json",
+  "title": "SoftwareApp",
+  "type": "object",
+  "required": ["Name"],
+  "properties": {
+    "Name":        { "type": "string" },
+    "Version":     { "type": "string" },
+    "Publisher":   { "type": "string" },
+    "Path":        { "type": "string" },
+    "Source":      { "type": "string", "enum": ["Installé", "Portable", "Raccourci", "Cloud", "Inconnu"] },
+    "State":       { "type": "string", "enum": ["À jour", "Mise à jour disponible", "Obsolète", "Inconnu"] },
+    "CanInstall":  { "type": "boolean" },
+    "CanUninstall":{ "type": "boolean" }
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "Firefox",
+    "Version": "118.0",
+    "Publisher": "Mozilla",
+    "Path": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+    "Source": "Installé",
+    "State": "À jour",
+    "CanInstall": false,
+    "CanUninstall": true
+  },
+  {
+    "Name": "7-Zip",
+    "Version": "22.00",
+    "Publisher": "Igor Pavlov",
+    "Path": "P:\\Portable\\7zip\\7zFM.exe",
+    "Source": "Portable",
+    "State": "À jour",
+    "CanInstall": false,
+    "CanUninstall": false
+  }
+]

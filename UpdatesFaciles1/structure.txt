@@ -1,0 +1,11 @@
+UpdatesFaciles/
+├── App.xaml                  ← Démarrage & ressources globales
+├── App.xaml.ps1             ← Script de lancement
+├── Views/
+│   └── MainWindow.xaml      ← Fenêtre principale
+├── ViewModels/
+│   └── MainViewModel.ps1    ← Logique et données
+├── Resources/
+│   └── icon.ico             ← Icône appli
+├── Libs/
+│   └── MahApps.Metro/       ← DLLs MahApps.Metro + ControlzEx

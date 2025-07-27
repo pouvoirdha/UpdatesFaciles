@@ -1,0 +1,401 @@
+UpdatesFaciles : Spécifications du Projet
+Objectif
+UpdatesFaciles est un outil PowerShell modulaire pour techniciens IT débutants, permettant de gérer les logiciels (installés, portables, cloud) sur 5 à 10 PC. Il doit être :
+
+Modulaire : Fonctionnalités indépendantes et réutilisables.
+Documenté : Guides utilisateur/développeur via platyPS, avec liens markdown croisés.
+Sécurisé : Logs chiffrés (AES256 + DPAPI), audit RGPD, rôles (Admin, Technicien, Viewer).
+Accessible : Conforme WCAG 2.1 (navigation clavier, contrastes élevés, multilingue).
+Extensible : Support des plugins et API locale.
+Performant : Scans rapides (< 5 min pour 10 PC), faible impact CPU/mémoire.
+Intuitif : Interface WPF avec tableaux, icônes colorées, notifications, animations légères.
+Prêt à l’emploi : Livré avec scripts d’installation, diagnostic, et guide pour débutants.
+
+Structure du Projet
+Arborescence
+/UpdatesFaciles/
+├── Sources/                # Scripts PowerShell (.psm1)
+├── Models/                 # Objets typés (SoftwareApp, UserPrefs, etc.)
+├── ViewModels/             # Logique MVVM pour l’interface
+├── Views/                  # Fichiers XAML
+│   ├── Styles/             # Styles MahApps.Metro (Buttons.xaml, Colors.xaml, Controls.xaml)
+│   ├── MainWindow.xaml     # Interface principale
+├── Actions/                # Scripts pour actions (install, update, rollback)
+├── Localization/           # Fichiers de traduction
+├── Plugins/                # Extensions personnalisées
+├── Tests/                  # Tests Pester
+├── Libs/                   # Bibliothèques externes
+│   ├── MahApps.Metro/      # MahApps.Metro.dll, ControlzEx.dll
+├── Ressources/             # Fichiers statiques (icon.ico)
+├── prefs.json              # Préférences utilisateur
+├── logs.txt                # Logs chiffrés
+├── audit.log               # Audit RGPD
+├── Context_UpdatesFaciles.json  # Liste des fichiers existants et leur statut
+├── IA_Log.md               # Journal des interactions IA
+├── README_UpdatesFaciles.md    # Résumé technique et installation
+├── GuideContributeur.md        # Conventions et bonnes pratiques
+├── Accueil_UpdatesFaciles.md   # Guide utilisateur
+├── Historique_Modules.md       # Journal des validations
+├── Setup-UpdatesFaciles.ps1    # Script d’installation
+├── Test-UpdatesFaciles.ps1     # Script de diagnostic
+├── PromptHelper.psm1           # Utilitaires PowerShell
+├── main.ps1                    # Point d’entrée principal
+├── App.xaml.ps1                # Initialisation interface
+
+Objets Principaux
+
+SoftwareApp : Logiciel (nom, version, éditeur, type, état, chemin, source, CanInstall, CanUninstall).
+UserPrefs : Préférences (thème, langue, dossiers à scanner).
+LogEntry : Journalisation (action, date, résultat).
+AuditRecord : Audit sécurisé (RGPD).
+
+Caractéristiques des objets :
+
+Structure typée ([PSCustomObject] ou classe PowerShell).
+Schéma JSON (Draft 2020-12).
+Tests Pester automatisés.
+Mini-guide et exemples JSON.
+
+Schéma JSON pour SoftwareApp :
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "Name": { "type": "string" },
+    "Version": { "type": "string" },
+    "Publisher": { "type": "string" },
+    "Type": { "type": "string", "enum": ["Installed", "Portable", "Cloud"] },
+    "State": { "type": "string", "enum": ["Detected", "UpToDate", "UpdateAvailable", "Error"] },
+    "Path": { "type": "string" },
+    "Source": { "type": "string", "enum": ["Registry", "Portable", "Shortcut"] },
+    "CanInstall": { "type": "boolean" },
+    "CanUninstall": { "type": "boolean" }
+  },
+  "required": ["Name", "Version", "Source"]
+}
+
+Modules et Fonctionnalités
+Statut des Modules
+
+
+
+Module
+Fonction
+Statut
+
+
+
+1
+Structure & objets typés
+✅ Validé
+
+
+2
+Interface graphique WPF
+À valider
+
+
+3
+Détection logicielle
+À venir
+
+
+4
+Actions (install/update/rollback)
+À venir
+
+
+5
+Préférences utilisateur
+À venir
+
+
+6
+Logs & audit
+À venir
+
+
+7
+Import/export
+À venir
+
+
+8
+Supervision & monitoring
+À venir
+
+
+9
+Sécurité & RGPD
+À venir
+
+
+10
+Plugins & packaging
+À venir
+
+
+11
+Tests automatisés & documentation
+À venir
+
+
+12
+Personnalisation UI & langue
+À venir
+
+
+Module 1 : SoftwareApp.psm1
+
+Statut : ✅ Validé
+Fonction principale : New-SoftwareApp (crée un objet SoftwareApp).
+Tests Pester : 5 tests réussis (SoftwareApp.Tests.ps1).
+Comportements testés :
+Création complète.
+Fallback sur "Inconnu" pour valeurs vides/$null.
+Validation manuelle (Source, State).
+Détection d’erreurs.
+
+
+Sécurité : Validation stricte sans blocage ValidateSet.
+Fallback : Chaînes vides/$null → "Inconnu".
+Chemin : /Sources/SoftwareApp.psm1
+Documentation : Prête pour Get-Help (.SYNOPSIS, .EXAMPLE à venir).
+Exemple narratif : Création d’un objet SoftwareApp pour Firefox (Name: "Firefox", Version: "121.0", Source: "Registry", State: "UpToDate").
+
+Module 2 : Interface Graphique WPF
+
+Objectifs : Créer une interface WPF avec DataGrid, boutons de scan, notifications visuelles.
+Exigences :
+Utiliser <Window> classique, charger MahApps.Metro via fichiers locaux.
+ObservableCollection pour données fictives (ex. : Firefox, 7-Zip).
+Conforme WCAG 2.1.
+
+
+Exemple narratif : Un technicien ouvre l’interface, voit un tableau listant Firefox (à jour, vert) et VLC (mise à jour disponible, orange), clique sur « Scanner » pour détecter les logiciels, et reçoit une notification « Scan terminé : 3 logiciels détectés ».
+
+Module 3 : Détection Logicielle
+
+Objectifs :
+Détecter les logiciels installés via le registre (HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall, HKCU:\Software...).
+Identifier les logiciels portables (ex. : C:\PortableApps, OneDrive) via métadonnées .exe.
+Détecter les raccourcis (bureau, menu Démarrer).
+Vérifier les mises à jour (automatique via flux, manuelle via liens/scripts).
+Scan rapide (< 5 min pour 10 PC), faible impact CPU/mémoire.
+
+
+Exigences :
+Utiliser Get-CimInstance pour la détection.
+Blocs try/catch pour opérations critiques.
+Commentaires pédagogiques pour débutants.
+Vérifier modules via Get-Module -ListAvailable.
+Gestion des identifiants via CredentialManager.
+
+
+Exemple narratif : Un technicien scanne 5 PC, détecte VLC 3.0.16 (installé), 7-Zip 23.01 (portable dans C:\PortableApps), et un raccourci Notepad++ sur le bureau. Une notification indique une mise à jour disponible pour VLC (3.0.18).
+
+Consignes Techniques
+Instructions pour l’IA
+
+Transition :
+Vérifier les artefacts existants (scripts, tests, documentation) via Test-Path, Get-Module -ListAvailable.
+Adapter aux nouvelles exigences (support débutants, scripts d’installation/diagnostic).
+Prioriser ce prompt en cas de conflit avec versions antérieures.
+Signaler les conflits (ex. : fichier existant détecté) avec suggestions (ex. : fusion, alternative).
+
+
+Cohérence :
+Maintenir le style des exécutions précédentes (ex. : utiliser Get-CimInstance).
+Lister les changements dans un bloc "Changements appliqués".
+Inclure un identifiant unique dans les fichiers générés (ex. : # Généré par IA_X le 2025-07-27).
+
+
+Autonomie :
+Proposer la création de modules/fichiers incomplets.
+Compléter sans attendre relance explicite, en respectant l’architecture.
+Valider modules via Get-Module -ListAvailable, installer manquants via Install-Module ou Chocolatey.
+
+
+Workflow :
+Vérifier l’existence des fichiers/modules (ex. : Test-Path, Get-Module).
+Si les fichiers ne sont pas accessibles (ex. : /UpdatesFaciles non détecté), demander à l’utilisateur l’URL du dépôt Git ou le chemin du dossier cloud.
+Générer les fichiers dans les dossiers spécifiés (ex. : /Sources pour .psm1).
+Indiquer explicitement le chemin pour chaque fichier (ex. : "Placer dans /UpdatesFaciles/Sources/SoftwareDetection.psm1").
+Fournir un script PowerShell pour copier automatiquement les fichiers (ex. : via Out-File).
+Si la réponse est trop longue, diviser en parties numérotées avec un titre clair (ex. : "Partie 1 : SoftwareDetection.psm1") et un résumé.
+Fournir des explications contextuelles pour chaque fichier (rôle, utilisation).
+Inclure des conseils de gestion de projet pour débutants (ex. : prioriser modules essentiels, valider chaque étape).
+Proposer des améliorations proactives (ex. : optimisations, export CSV).
+Fournir un calendrier de développement pour les modules restants (ex. : Module 3 en 2 semaines).
+Adopter un ton encourageant (ex. : "Super travail ! Voici comment utiliser ce fichier").
+Fournir des ressources pédagogiques (ex. : tutoriels PowerShell, documentation MahApps.Metro).
+Proposer des visualisations (ex. : schéma de l’arborescence) si demandé.
+Mettre à jour Context_UpdatesFaciles.json et IA_Log.md avec chaque interaction.
+
+
+
+Conventions PowerShell
+
+Verbes : Approuvés (Get-, Set-, New-, Invoke-).
+Paramètres : Explicites, typés, avec try/catch.
+Encodage : UTF-8 sans BOM.
+Documentation : Get-Help avec .SYNOPSIS, .DESCRIPTION, .EXAMPLE.
+Signature : Signer scripts pour production.
+Tests :
+Pester ≥ 5.7.1, automatisés, silencieux, reproductibles.
+Couvrir toutes propriétés des objets (ex. : SoftwareApp.Name, Version).
+Vérifier blocs Describe/It, éviter interactions manuelles.
+Encapsuler tests manuels avec InvocationName + ExpectingInput.
+
+
+
+Exemple de fonction PowerShell :
+function Get-InstalledSoftware {
+    [CmdletBinding()]
+    param ()
+    try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
+        $items = Get-ItemProperty -Path $regPath -ErrorAction SilentlyContinue
+        $items | ForEach-Object {
+            New-SoftwareApp -Name $_.DisplayName -Version $_.DisplayVersion -Publisher $_.Publisher -Source "Registry"
+        }
+    } catch {
+        Write-Error "Erreur de détection : $_"
+    }
+}
+
+Interface Utilisateur (WPF)
+
+Framework : <Window> classique, MahApps.Metro via Assembly.LoadFrom ou fichiers locaux (Styles/Buttons.xaml, Colors.xaml, Controls.xaml).
+Fallback : Interface <Window> fonctionnelle (tableau, boutons) si MahApps échoue.
+Notifications : MessageBox, barres de progression pour erreurs/mises à jour.
+Accessibilité : WCAG 2.1 (navigation clavier, contrastes élevés).
+ViewModel : ObservableCollection avec données fictives (Firefox, 7-Zip, Notepad++).
+UX/UI :
+DataGrid avec tri/filtres (nom, version, état).
+Icônes colorées (vert : à jour, orange : mise à jour disponible, rouge : erreur).
+Thèmes clair/sombre, animations légères.
+
+
+Instructions techniques :
+Supprimer x:Class dans XAML.
+Remplacer pack:// par chemins relatifs (ex. : .\Styles\Controls.xaml).
+Un seul x:Name par contrôle.
+Associer événements XAML (ex. : Button_Click) à fonctions PowerShell.
+Vérifier présence des fichiers (XAML, DLLs, icônes) via Test-Path.
+
+
+
+Sécurité
+
+Logs : Chiffrés (AES256 + DPAPI) dans logs.txt.
+Exemple : {Action: "Update", Logiciel: "Firefox", Version: "121.0", Date: "2025-07-27", Résultat: "Succès"}.
+
+
+Audit : Traçabilité RGPD dans audit.log (utilisateur, rôle, horodatage).
+Rôles : Admin (toutes actions), Technicien (scan, mise à jour), Viewer (lecture seule).
+
+Installation
+
+Script : Setup-UpdatesFaciles.ps1 crée l’arborescence, installe modules (Pester ≥ 5.7.1, platyPS, ChocolateyGet, CredentialManager, PromptHelper), vérifie dépendances (PowerShell ≥ 7.0, .NET ≥ 4.7.2).
+Dépendances :
+PowerShell ≥ 7.0 : choco install powershell-core -y.
+.NET ≥ 4.7.2 : choco install dotnetfx --version 4.7.2 -y.
+DLLs MahApps.Metro : Copier dans /Libs/MahApps.Metro.
+
+
+
+Guide de Démarrage Rapide
+
+Prérequis :
+Installer PowerShell ≥ 7.0 : choco install powershell-core -y.
+Installer .NET ≥ 4.7.2 : choco install dotnetfx --version 4.7.2 -y.
+Installer modules : Install-Module -Name Pester, platyPS, ChocolateyGet, CredentialManager, PromptHelper -Scope CurrentUser -Force.
+Copier MahApps.Metro.dll, ControlzEx.dll dans /Libs/MahApps.Metro.
+
+
+Lancement :
+Exécuter .\main.ps1 ou .\App.xaml.ps1.
+
+
+Relance IA :
+Exemple : "Copilot, relance UpdatesFaciles à partir du Module 3 (Détection logicielle)."
+
+
+
+Scénarios d’Utilisation
+
+Mise à jour massive : Scanner 5 PC, afficher logiciels obsolètes, mettre à jour en batch.
+Gestion cloud : Détecter logiciel portable dans OneDrive, vérifier version, appliquer mise à jour.
+
+Performance
+
+Scans : < 5 min pour 10 PC, faible impact CPU/réseau.
+Mises à jour : Téléchargements séquentiels pour limiter l’impact réseau.
+
+Gestion des Erreurs
+
+Messages : Clairs, adaptés aux débutants (ex. : "Mise à jour échouée : vérifiez le réseau").
+Rollback : Automatique pour échecs critiques, avec sauvegarde.
+Diagnostic : Test-UpdatesFaciles.ps1 identifie bugs, propose solutions.
+
+Inspiration
+
+Ninite Pro : Mises à jour automatiques centralisées.
+Patch My PC : Scan rapide, interface minimaliste.
+PortableApps.com : Gestion des logiciels portables.
+
+Validation
+
+Tests : Pester ≥ 5.7.1, couvrant toutes propriétés des objets, incluant cas d’erreur (ex. : dossier invalide, module manquant).
+Documentation : Générée via platyPS, avec Get-Help.
+Sécurité : Logs chiffrés, audit RGPD, rôles.
+UX : Notifications visuelles, conformité WCAG 2.1.
+
+Documentation
+
+Fichiers :
+README_UpdatesFaciles.md : Résumé technique, installation.
+GuideContributeur.md : Conventions PowerShell, bonnes pratiques UI.
+Accueil_UpdatesFaciles.md : Guide utilisateur.
+Historique_Modules.md : Journal des validations.
+Context_UpdatesFaciles.json : Liste des fichiers existants et leur statut.
+IA_Log.md : Journal des interactions IA.
+
+
+Mise à jour : Utiliser Update-PromptNotes (PromptHelper.psm1) pour journaliser.
+
+Bonnes Pratiques PowerShell/WPF
+
+Fonctions : Définir/importer avant utilisation (ex. : Write-PromptLogo).
+Export-ModuleMember : Utiliser dans .psm1 uniquement.
+Paramètres : Éviter doublons dans param().
+XAML :
+Supprimer x:Class.
+Remplacer pack:// par chemins relatifs.
+Un seul x:Name par contrôle.
+Associer événements XAML à fonctions PowerShell.
+
+
+Diagnostic : Vérifier fichiers (XAML, DLLs, icônes) avant exécution.
+
+Changements Appliqués
+
+Structure : Sections réorganisées pour clarté (Objectif, Structure, Modules, Consignes).
+Clarté : Langage simplifié, phrases courtes, jargon réduit.
+Redondances : Supprimées (ex. : instructions PowerShell répétées).
+Accessibilité : Tableaux, listes numérotées, commentaires pédagogiques.
+Maintenance : Liens croisés, journal des changements.
+Exhaustivité : Tous cas d’utilisation couverts, exemples pratiques.
+Ajouts :
+Exemples narratifs pour Modules 1, 2, 3.
+Schéma JSON pour SoftwareApp.
+Exemple de code PowerShell.
+Instructions techniques spécifiques pour XAML/PowerShell.
+Workflow explicite pour l’IA, incluant chemins des fichiers, division des réponses longues, support débutant, améliorations proactives, et ton encourageant.
+Gestion des conflits avec identifiant IA et versionnage temporaire.
+Demande d’accès aux fichiers existants (Git, cloud).
+Script pour copier automatiquement les fichiers.
+Fichiers Context_UpdatesFaciles.json et IA_Log.md pour synchronisation.
+
+

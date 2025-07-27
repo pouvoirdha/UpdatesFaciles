@@ -1,0 +1,87 @@
+🧭 Guide Contributeur – UpdatesFaciles
+🎯 Objectif
+Ce guide s’adresse aux techniciens, développeurs et contributeurs du projet UpdatesFaciles. Il définit les conventions à respecter pour assurer la cohérence, la modularité, la sécurité et l’accessibilité du projet, tout en gardant une logique compatible avec PowerShell scripté.
+
+🛠️ Structure de contribution
+- Chaque contribution est un module indépendant avec responsabilité unique
+- Le module doit respecter la check-list du projet : code, test, documentation, intégration
+- La validation se fait bloc par bloc, avec feedback explicite
+- Toute contribution doit être documentée dans Historique_Modules.md
+
+🔧 Style attendu PowerShell
+| Éléments | Convention recommandée | 
+| Nom des fonctions | Préfixe clair en anglais : Get-, Set-, New-, Invoke- | 
+| Paramètres | Explicites, typés si possible, commentés | 
+| Traitement d’erreur | Bloc try/catch systématique sur opérations critiques | 
+| Modules externes | Vérification préalable avec Get-Module ou Get-Command | 
+| Encodage | UTF-8 sans BOM pour tous les fichiers | 
+| Structure des scripts | Fonctionnelle, modulaire, .psm1 recommandé pour modules | 
+
+
+
+🖼️ Bonnes pratiques UI (Module 2)
+- Utiliser <Window> classique en PowerShell scripté (fallback depuis <MetroWindow>)
+- Ne pas utiliser de bloc pack://application (non supporté par XamlReader.Load())
+- Charger les styles manuellement via PowerShell ou créer des fichiers locaux dans /Styles
+- Icône à charger via IconBitmapDecoder → chemin relatif corrigé dans Ressources/icon.ico
+- Injecter le ViewModel via $window.FindName() et ItemsSource
+- Éviter les propriétés non reconnues en XAML comme GlowBrush hors application compilée
+
+📋 Format attendu par module
+| Élément | Description | 
+| 💻 Code complet | PowerShell/XAML bien commenté, modulaire, structuré | 
+| 🧩 Objets typés | [PSCustomObject] ou class, JSON Schema associé | 
+| 🧪 Tests unitaires | Pester ≥ 5.7.1, mocks si besoin, validés | 
+| 📖 Documentation | Markdown, platyPS si applicable | 
+| 🔄 Scénario d’usage | Exemple de flux clair et reproductible | 
+| 🔐 Sécurité | Journalisation, contrôle d’accès, chiffrement si pertinent | 
+| 🌍 Multilingue | Fichier .psd1 localisé, fallback anglais | 
+| 🔗 Intégration | Instructions claires pour main.ps1, UI ou modèles | 
+
+
+
+✅ Règles de validation
+Un module est validé lorsqu’il :
+- Passe les tests unitaires
+- Est compréhensible sans connaissance avancée
+- Respecte les conventions techniques et fonctionnelles
+- Ne génère aucune erreur lors de l’intégration
+- Est documenté (utilisateur + développeur)
+
+💬 Communication avec Copilot
+Pour toute demande ou relance via Copilot :
+
+- Indique le nom du projet : UpdatesFaciles
+- Spécifie le numéro du module concerné
+- Précise si tu veux une réponse complète ou une production en blocs
+- Valide chaque section avant de passer à la suivante
+💡 Exemple :
+“Copilot, génère le module 8 du projet UpdatesFaciles, selon le guide contributeur et le prompt principal.”
+
+
+📦 Bonnes pratiques complémentaires
+- Utiliser Get-Help avec .SYNOPSIS, .DESCRIPTION, .EXAMPLE
+- Intégrer la journalisation via Write-Log ou méthode structurée
+- Séparer les préférences en fichier JSON (prefs.json)
+- Proposer un résumé technique en fin de module
+- Créer des fichiers README_<Module>.md si besoin
+- Mettre à jour automatiquement Historique_Modules.md après validation
+
+🔐 Sécurité
+- Utiliser AES256 + DPAPI pour les secrets
+- Signer les scripts destinés à la production
+- Inclure une entrée dans audit.log pour chaque action majeure
+- Respecter les rôles (Admin, Technicien, Viewer)
+- Loguer les accès et modifications critiques
+
+📂 Ressources utiles
+- ✅ README_UpdatesFaciles.md
+- 📋 Historique_Modules.md
+- 📦 UpdatesFaciles_Prompt.md
+- 📘 Ce guide : GuideContributeur.md
+- 🏠 Page d’accueil
+- 📁 Modules dans /Actions/, /Plugins/, /Tests/, /ViewModels/
+
+Merci pour ta contribution au projet UpdatesFaciles 🚀
+Grâce à ta rigueur, tu garantis la robustesse, l’accessibilité et la pérennité de l’outil.
+

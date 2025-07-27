@@ -1,0 +1,284 @@
+<Window x:Class="UpdatesFaciles.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="UpdatesFaciles - Assistant de gestion logiciels" 
+        Height="700" Width="1200"
+        MinHeight="500" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Icon="pack://application:,,,/Ressources/icon.ico">
+    
+    <!-- Fallback vers Window classique si MahApps.Metro échoue -->
+    <Window.Resources>
+        <!-- Styles de base sans dépendance MahApps -->
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2E86AB"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style x:Key="ButtonPrimaryStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2E86AB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Content}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#4A9ECA"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1F6B87"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="ButtonSecondaryStyle" TargetType="Button" BasedOn="{StaticResource ButtonPrimaryStyle}">
+            <Setter Property="Background" Value="#A23B72"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#C14E8A"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="StatusIndicatorStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Margin" Value="5,0"/>
+        </Style>
+
+        <!-- Style pour DataGrid -->
+        <Style x:Key="DataGridStyle" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Extended"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#E0E0E0"/>
+            <Setter Property="AlternatingRowBackground" Value="#F8F9FA"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D0D0D0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- En-tête -->
+        <Border Grid.Row="0" Background="#F3F4F6" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <Image Grid.Column="0" Source="pack://application:,,,/Ressources/icon.ico" 
+                       Width="32" Height="32" Margin="0,0,10,0"/>
+                
+                <StackPanel Grid.Column="1" Orientation="Vertical">
+                    <TextBlock Text="UpdatesFaciles" Style="{StaticResource HeaderTextStyle}"/>
+                    <TextBlock Text="Assistant de gestion des logiciels pour techniciens IT" 
+                             FontSize="12" Foreground="#6B7280" Margin="5,0"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock Text="Statut:" FontWeight="SemiBold" Margin="5" VerticalAlignment="Center"/>
+                    <Ellipse x:Name="StatusIndicator" Style="{StaticResource StatusIndicatorStyle}" 
+                           Fill="Orange" ToolTip="En attente de scan"/>
+                    <TextBlock x:Name="StatusText" Text="Prêt" Margin="5" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Options de scan -->
+        <Border Grid.Row="1" Background="White" Padding="15" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <GroupBox Header="Options de scan" Padding="10" Margin="0,0,15,0">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="ChkInstalledSoftware" Content="Logiciels installés" 
+                                    IsChecked="True" Margin="0,0,15,0"/>
+                            <CheckBox x:Name="ChkPortableSoftware" Content="Logiciels portables" 
+                                    IsChecked="True" Margin="0,0,15,0"/>
+                            <CheckBox x:Name="ChkShortcuts" Content="Raccourcis" 
+                                    IsChecked="False" Margin="0,0,15,0"/>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                    <GroupBox Header="Chemin portables" Padding="10">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="TxtPortablePath" Width="200" Height="25" 
+                                   Text="C:\PortableApps" VerticalAlignment="Center"/>
+                            <Button Content="..." Width="30" Height="25" Margin="5,0,0,0"
+                                  Click="BrowsePortablePath_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="BtnScan" Content="🔍 Scanner" 
+                          Style="{StaticResource ButtonPrimaryStyle}" 
+                          Click="ScanSoftware_Click"/>
+                    <Button x:Name="BtnUpdateAll" Content="⬆️ Tout mettre à jour" 
+                          Style="{StaticResource ButtonSecondaryStyle}" 
+                          Click="UpdateAllSoftware_Click" IsEnabled="False"/>
+                    <Button x:Name="BtnExport" Content="📤 Exporter" 
+                          Style="{StaticResource ButtonPrimaryStyle}" 
+                          Click="ExportResults_Click" IsEnabled="False"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Tableau principal -->
+        <Grid Grid.Row="2" Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Barre de filtres et statistiques -->
+            <Border Grid.Row="0" Background="#F9FAFB" Padding="10" Margin="0,0,0,10" BorderBrush="#E5E7EB" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="Filtrer:" FontWeight="SemiBold" Margin="5" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbFilterSource" Width="120" Margin="5" SelectedIndex="0">
+                            <ComboBoxItem Content="Toutes sources"/>
+                            <ComboBoxItem Content="Registry"/>
+                            <ComboBoxItem Content="Portable"/>
+                            <ComboBoxItem Content="Shortcuts"/>
+                        </ComboBox>
+                        <ComboBox x:Name="CmbFilterState" Width="120" Margin="5" SelectedIndex="0">
+                            <ComboBoxItem Content="Tous états"/>
+                            <ComboBoxItem Content="À jour"/>
+                            <ComboBoxItem Content="Mise à jour disponible"/>
+                            <ComboBoxItem Content="Obsolète"/>
+                        </ComboBox>
+                        <TextBox x:Name="TxtSearch" Width="150" Height="25" Margin="5" 
+                               x:Name="SearchBox" TextChanged="SearchBox_TextChanged"
+                               Tag="Rechercher..."/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <TextBlock x:Name="TxtStats" Text="0 logiciel(s)" FontWeight="SemiBold" 
+                                 Margin="10,0" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,0">
+                            <Ellipse Fill="Green" Style="{StaticResource StatusIndicatorStyle}"/>
+                            <TextBlock x:Name="TxtUpToDate" Text="0" Margin="2,0" VerticalAlignment="Center"/>
+                            <Ellipse Fill="Orange" Style="{StaticResource StatusIndicatorStyle}"/>
+                            <TextBlock x:Name="TxtUpdatable" Text="0" Margin="2,0" VerticalAlignment="Center"/>
+                            <Ellipse Fill="Red" Style="{StaticResource StatusIndicatorStyle}"/>
+                            <TextBlock x:Name="TxtObsolete" Text="0" Margin="2,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- DataGrid des logiciels -->
+            <DataGrid x:Name="SoftwareDataGrid" Grid.Row="1" Style="{StaticResource DataGridStyle}"
+                    SelectionChanged="SoftwareDataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="✓" Width="30" Binding="{Binding IsSelected}"/>
+                    
+                    <DataGridTemplateColumn Header="État" Width="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Ellipse Style="{StaticResource StatusIndicatorStyle}">
+                                    <Ellipse.Fill>
+                                        <MultiBinding Converter="{x:Static local:StateToColorConverter.Instance}">
+                                            <Binding Path="State"/>
+                                        </MultiBinding>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
+                    <DataGridTextColumn Header="Nom" Binding="{Binding Name}" Width="200"/>
+                    <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="100"/>
+                    <DataGridTextColumn Header="Éditeur" Binding="{Binding Publisher}" Width="150"/>
+                    <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="80"/>
+                    <DataGridTextColumn Header="Chemin" Binding="{Binding Path}" Width="*"/>
+                    
+                    <DataGridTemplateColumn Header="Actions" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="↗️" Width="25" Height="25" Margin="2" 
+                                          ToolTip="Mettre à jour" Click="UpdateSingle_Click"
+                                          IsEnabled="{Binding CanUpdate}"/>
+                                    <Button Content="🗑️" Width="25" Height="25" Margin="2" 
+                                          ToolTip="Désinstaller" Click="UninstallSingle_Click"
+                                          IsEnabled="{Binding CanUninstall}"/>
+                                    <Button Content="ℹ️" Width="25" Height="25" Margin="2" 
+                                          ToolTip="Informations" Click="ShowInfo_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Barre de statut -->
+        <Border Grid.Row="3" Background="#F3F4F6" Padding="10" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock x:Name="TxtStatusMessage" Text="Prêt à scanner" 
+                             VerticalAlignment="Center" Margin="5,0"/>
+                    <ProgressBar x:Name="ProgressBar" Width="200" Height="20" 
+                               Margin="10,0" Visibility="Collapsed"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="⚙️ Préférences" Click="OpenPreferences_Click" 
+                          Style="{StaticResource ButtonPrimaryStyle}"/>
+                    <Button Content="📋 Logs" Click="ViewLogs_Click" 
+                          Style="{StaticResource ButtonPrimaryStyle}"/>
+                    <Button Content="❓ Aide" Click="ShowHelp_Click" 
+                          Style="{StaticResource ButtonPrimaryStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

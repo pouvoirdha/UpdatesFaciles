@@ -1,0 +1,13 @@
+cd C:\Script\UpdatesFaciles2
+
+.\Setup-UpdatesFaciles.ps1
+
+
+
+WARNING: The version '1.4.8.1' of module 'PackageManagement' is currently in use. Retry the operation after closing the applications.
+WARNING: ⚠️ Copie manuelle nécessaire : placer MahApps.Metro.dll dans Libs\MahApps.Metro ok
+WARNING: ⚠️ Copie manuelle nécessaire : placer ControlzEx.dll dans Libs\MahApps.Metro ok
+
+🎯 Setup terminé – structure du projet prête !
+
+----------------------------------------------------
