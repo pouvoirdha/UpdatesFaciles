@@ -1,3 +1,0 @@
-# UpdatesFaciles - Journal des opérations
-
-[2025-07-27 00:58:29] [App.xaml] Démarrage de l'application
