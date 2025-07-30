@@ -1,353 +1,513 @@
 #Requires -Version 5.1
+
 <#
 .SYNOPSIS
-    Script d'installation pour UpdatesFaciles
+    Module de détection des logiciels - UpdatesFaciles Module 3
 .DESCRIPTION
-    Configure l'environnement, crée la structure de dossiers, installe les modules requis
-    et vérifie les dépendances pour le projet UpdatesFaciles.
-.EXAMPLE
-    .\Setup-UpdatesFaciles.ps1
+    Détection complète des logiciels installés, portables, raccourcis et cloud
+    Conforme aux exigences UpdatesFaciles_Prompt.txt
 .NOTES
-    Auteur: UpdatesFaciles Team
-    Version: 1.0
-    Compatible: PowerShell 5.1+, .NET 4.7.2+
+    Fichier : Sources/SoftwareDetection.psm1
+    Version : 3.1
+    Auteur : UpdatesFaciles Team
 #>
 
-[CmdletBinding()]
-param(
-    [string]$InstallPath = ".\UpdatesFaciles",
-    [switch]$Force,
-    [switch]$SkipModuleInstall
+# Vérification des dépendances
+if (-not (Test-Path P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1)) {
+    Write-Error "Module SoftwareApp.psm1 requis à P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1"
+    return
+}
+Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1 -Force
+
+# =============================================================================
+# VARIABLES GLOBALES ET CONFIGURATION
+# =============================================================================
+
+$Script:DetectionConfig = @{
+    TimeoutSeconds = 300  # 5 minutes max
+    MaxConcurrentJobs = 5
+    EnablePortableDetection = $true
+    EnableShortcutDetection = $true
+    EnableUpdateCheck = $true
+    DebugMode = $false
+}
+
+$Script:StandardPaths = @{
+    ProgramFiles = @(
+        "${env:ProgramFiles}",
+        "${env:ProgramFiles(x86)}"
+    )
+    PortableApps = @(
+        "C:\PortableApps",
+        "$env:USERPROFILE\PortableApps",
+        "$env:OneDrive\PortableApps",
+        "$env:OneDriveCommercial\PortableApps"
+    )
+    CloudSync = @(
+        "$env:OneDrive",
+        "$env:OneDriveCommercial", 
+        "$env:USERPROFILE\Google Drive",
+        "$env:USERPROFILE\Dropbox"
+    )
+    Shortcuts = @{
+        Desktop = "$env:USERPROFILE\Desktop"
+        StartMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
+        CommonStartMenu = "$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs"
+    }
+}
+
+$Script:RegistryPaths = @(
+    "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+    "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+    "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 )
 
-# Configuration des couleurs pour une meilleure lisibilité
-$Host.UI.RawUI.ForegroundColor = "White"
+Write-Host "Module SoftwareDetection chargé - Version 3.1" -ForegroundColor Green
 
-function Write-SetupMessage {
+# =============================================================================
+# FONCTIONS UTILITAIRES
+# =============================================================================
+
+function Write-DetectionLog {
+    [CmdletBinding()]
     param(
+        [Parameter(Mandatory)]
         [string]$Message,
-        [ValidateSet("Info", "Success", "Warning", "Error")]
-        [string]$Type = "Info"
-    )
-    
-    $colors = @{
-        "Info" = "Cyan"
-        "Success" = "Green" 
-        "Warning" = "Yellow"
-        "Error" = "Red"
-    }
-    
-    Write-Host "[$Type] $Message" -ForegroundColor $colors[$Type]
-}
-
-function Test-Prerequisites {
-    Write-SetupMessage "Vérification des prérequis..." -Type "Info"
-    
-    # Vérification PowerShell
-    $psVersion = $PSVersionTable.PSVersion
-    Write-SetupMessage "PowerShell version: $($psVersion.ToString())" -Type "Info"
-    
-    if ($psVersion.Major -lt 5) {
-        Write-SetupMessage "PowerShell 5.1+ requis. Version actuelle: $($psVersion.ToString())" -Type "Error"
-        return $false
-    }
-    
-    # Vérification .NET Framework
-    try {
-        $dotnetVersion = [System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription
-        Write-SetupMessage ".NET Framework: $dotnetVersion" -Type "Info"
-    }
-    catch {
-        Write-SetupMessage "Impossible de détecter la version .NET Framework" -Type "Warning"
-    }
-    
-    # Vérification des droits d'exécution
-    $executionPolicy = Get-ExecutionPolicy
-    if ($executionPolicy -eq "Restricted") {
-        Write-SetupMessage "Policy d'exécution restrictive détectée: $executionPolicy" -Type "Warning"
-        Write-SetupMessage "Exécutez: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser" -Type "Info"
-    }
-    
-    return $true
-}
-
-function New-ProjectStructure {
-    param([string]$Path)
-    
-    Write-SetupMessage "Création de la structure de projet dans: $Path" -Type "Info"
-    
-    $folders = @(
-        "Sources",
-        "Models", 
-        "ViewModels",
-        "Views",
-        "Views\Styles",
-        "Actions",
-        "Localization", 
-        "Plugins",
-        "Tests",
-        "Libs",
-        "Libs\MahApps.Metro",
-        "Ressources",
-        "Modules",
-        "Modules\SoftwareApp",
-        "Modules\Detection", 
-        "Modules\Actions",
-        "Modules\UI",
-        "Modules\Logging",
-        "Modules\Security"
-    )
-    
-    try {
-        if (-not (Test-Path $Path)) {
-            New-Item -Path $Path -ItemType Directory -Force | Out-Null
-        }
-        
-        foreach ($folder in $folders) {
-            $fullPath = Join-Path $Path $folder
-            if (-not (Test-Path $fullPath)) {
-                New-Item -Path $fullPath -ItemType Directory -Force | Out-Null
-                Write-SetupMessage "Créé: $folder" -Type "Success"
-            }
-        }
-        
-        # Création des fichiers de configuration de base
-        $configFiles = @{
-            "prefs.json" = '{"theme": "light", "language": "fr-FR", "scanOptions": {"installed": true, "portable": true, "shortcuts": true}}'
-            "logs.txt" = "# UpdatesFaciles - Journal des opérations`n"
-            "audit.log" = "# UpdatesFaciles - Audit sécurisé`n"
-        }
-        
-        foreach ($file in $configFiles.GetEnumerator()) {
-            $filePath = Join-Path $Path $file.Key
-            if (-not (Test-Path $filePath)) {
-                Set-Content -Path $filePath -Value $file.Value -Encoding UTF8
-                Write-SetupMessage "Créé: $($file.Key)" -Type "Success"
-            }
-        }
-        
-        return $true
-    }
-    catch {
-        Write-SetupMessage "Erreur lors de la création de la structure: $($_.Exception.Message)" -Type "Error"
-        return $false
-    }
-}
-
-function Install-RequiredModules {
-    if ($SkipModuleInstall) {
-        Write-SetupMessage "Installation des modules ignorée (SkipModuleInstall)" -Type "Warning"
-        return
-    }
-    
-    Write-SetupMessage "Installation des modules requis..." -Type "Info"
-    
-    $requiredModules = @(
-        @{Name = "Pester"; MinVersion = "5.7.1"; Description = "Framework de tests unitaires"},
-        @{Name = "platyPS"; MinVersion = "0.14.0"; Description = "Génération de documentation"},
-        @{Name = "ChocolateyGet"; MinVersion = "4.1.0"; Description = "Gestion Chocolatey"; Optional = $true},
-        @{Name = "CredentialManager"; MinVersion = "2.0"; Description = "Gestion sécurisée des identifiants"; Optional = $true}
-    )
-    
-    foreach ($module in $requiredModules) {
-        try {
-            Write-SetupMessage "Vérification du module: $($module.Name)" -Type "Info"
-            
-            $installedModule = Get-Module -Name $module.Name -ListAvailable | 
-                Sort-Object Version -Descending | Select-Object -First 1
-            
-            if ($installedModule) {
-                if ($installedModule.Version -ge [Version]$module.MinVersion) {
-                    Write-SetupMessage "$($module.Name) v$($installedModule.Version) - OK" -Type "Success"
-                    continue
-                }
-                else {
-                    Write-SetupMessage "$($module.Name) v$($installedModule.Version) - Mise à jour requise (min: $($module.MinVersion))" -Type "Warning"
-                }
-            }
-            
-            Write-SetupMessage "Installation de $($module.Name)..." -Type "Info"
-            Install-Module -Name $module.Name -MinimumVersion $module.MinVersion -Scope CurrentUser -Force -AllowClobber
-            Write-SetupMessage "$($module.Name) installé avec succès" -Type "Success"
-        }
-        catch {
-            if ($module.Optional) {
-                Write-SetupMessage "Module optionnel $($module.Name) non installé: $($_.Exception.Message)" -Type "Warning"
-            }
-            else {
-                Write-SetupMessage "Erreur critique - Module $($module.Name): $($_.Exception.Message)" -Type "Error"
-                throw
-            }
-        }
-    }
-}
-
-function New-HelperModule {
-    param([string]$ProjectPath)
-    
-    $helperPath = Join-Path $ProjectPath "PromptHelper.psm1"
-    
-    if (Test-Path $helperPath) {
-        Write-SetupMessage "PromptHelper.psm1 existe déjà" -Type "Info"
-        return
-    }
-    
-    $helperContent = @'
-# PromptHelper.psm1 - Utilitaires pour UpdatesFaciles
-function Write-PromptLogo {
-    <#
-    .SYNOPSIS
-        Affiche le logo ASCII d'UpdatesFaciles
-    #>
-    $logo = @"
-    ╔══════════════════════════════════════╗
-    ║           UpdatesFaciles             ║
-    ║     Assistant de gestion logiciels   ║
-    ║              v1.0.0                  ║
-    ╚══════════════════════════════════════╝
-"@
-    Write-Host $logo -ForegroundColor Cyan
-}
-
-function Update-PromptNotes {
-    <#
-    .SYNOPSIS
-        Journalise les changements dans le projet
-    #>
-    param(
-        [string]$Message,
-        [string]$Module,
-        [string]$FilePath = ".\logs.txt"
+        [ValidateSet("Info", "Warning", "Error", "Debug")]
+        [string]$Level = "Info"
     )
     
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Module] $Message"
-    Add-Content -Path $FilePath -Value $logEntry -Encoding UTF8
+    $logMessage = "[$timestamp] [$Level] $Message"
+    
+    switch ($Level) {
+        "Info" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor White } }
+        "Warning" { Write-Warning $logMessage }
+        "Error" { Write-Error $logMessage }
+        "Debug" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor Cyan } }
+    }
 }
 
-function Test-MahAppsAvailability {
-    <#
-    .SYNOPSIS
-        Vérifie la disponibilité de MahApps.Metro
-    #>
-    $mahAppsPath = ".\Libs\MahApps.Metro\MahApps.Metro.dll"
-    return (Test-Path $mahAppsPath)
-}
-
-Export-ModuleMember -Function Write-PromptLogo, Update-PromptNotes, Test-MahAppsAvailability
-'@
+function Test-PathSafely {
+    [CmdletBinding()]
+    param([string]$Path)
     
     try {
-        Set-Content -Path $helperPath -Value $helperContent -Encoding UTF8
-        Write-SetupMessage "PromptHelper.psm1 créé" -Type "Success"
+        return (Test-Path $Path -ErrorAction SilentlyContinue)
     }
     catch {
-        Write-SetupMessage "Erreur lors de la création de PromptHelper.psm1: $($_.Exception.Message)" -Type "Error"
+        Write-DetectionLog "Erreur test chemin $Path : $($_.Exception.Message)" "Error"
+        return $false
     }
 }
 
-function Show-InstallationSummary {
-    param([string]$ProjectPath)
+function Get-FileVersionSafely {
+    [CmdletBinding()]
+    param([string]$FilePath)
     
-    Write-SetupMessage "`n=== RÉSUMÉ DE L'INSTALLATION ===" -Type "Info"
-    Write-SetupMessage "Projet installé dans: $ProjectPath" -Type "Success"
-    Write-SetupMessage "`nPour commencer:" -Type "Info"
-    Write-Host "  cd $ProjectPath" -ForegroundColor Yellow
-    Write-Host "  .\Test-UpdatesFaciles.ps1  # Diagnostic" -ForegroundColor Yellow
-    Write-Host "  .\main.ps1                 # Lancement" -ForegroundColor Yellow
+    try {
+        if (Test-PathSafely $FilePath) {
+            $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($FilePath)
+            return @{
+                Version = $versionInfo.FileVersion
+                ProductVersion = $versionInfo.ProductVersion
+                CompanyName = $versionInfo.CompanyName
+                ProductName = $versionInfo.ProductName
+                FileDescription = $versionInfo.FileDescription
+            }
+        }
+    }
+    catch {
+        Write-DetectionLog "Erreur version fichier $FilePath : $($_.Exception.Message)" "Debug"
+    }
     
-    Write-SetupMessage "`nModules suivants à développer:" -Type "Info"
-    $modules = @(
-        "Module 2: Interface graphique WPF",
-        "Module 3: Détection logicielle", 
-        "Module 4: Actions (install/update)",
-        "Module 5: Préférences utilisateur",
-        "Module 6: Logs & audit"
+    return $null
+}
+
+# =============================================================================
+# DÉTECTION LOGICIELS INSTALLÉS (REGISTRE)
+# =============================================================================
+
+function Get-InstalledSoftware {
+    [CmdletBinding()]
+    param(
+        [switch]$IncludeSystemComponents
     )
     
-    foreach ($module in $modules) {
-        Write-Host "  - $module" -ForegroundColor Gray
+    Write-DetectionLog "Début détection logiciels installés" "Info"
+    $installedSoftware = @()
+    $processedCount = 0
+    
+    try {
+        foreach ($registryPath in $Script:RegistryPaths) {
+            Write-DetectionLog "Scan registre : $registryPath" "Debug"
+            
+            try {
+                $registryItems = Get-ItemProperty $registryPath -ErrorAction SilentlyContinue | 
+                    Where-Object { 
+                        $_.DisplayName -and 
+                        (-not $_.SystemComponent -or $IncludeSystemComponents) -and
+                        (-not $_.ParentKeyName) -and
+                        ($_.DisplayName -notmatch "^(Update|Hotfix|Security Update)")
+                    }
+                
+                foreach ($item in $registryItems) {
+                    $processedCount++
+                    
+                    try {
+                        $software = New-SoftwareApp -Name $item.DisplayName `
+                                                  -Version ($item.DisplayVersion -replace "^\s*$", "Inconnu") `
+                                                  -Publisher ($item.Publisher -replace "^\s*$", "Inconnu") `
+                                                  -Path ($item.InstallLocation -replace "^\s*$", "Inconnu") `
+                                                  -Source "Registry" `
+                                                  -State "Detected"
+                        
+                        $installedSoftware += $software
+                        
+                        if ($processedCount % 50 -eq 0) {
+                            Write-DetectionLog "Progression : $processedCount logiciels traités" "Debug"
+                        }
+                    }
+                    catch {
+                        Write-DetectionLog "Erreur traitement élément registre : $($_.Exception.Message)" "Error"
+                    }
+                }
+            }
+            catch {
+                Write-DetectionLog "Erreur accès registre $registryPath : $($_.Exception.Message)" "Error"
+            }
+        }
+        
+        Write-DetectionLog "Détection installés terminée : $($installedSoftware.Count) logiciels trouvés" "Info"
+        return $installedSoftware
+    }
+    catch {
+        Write-DetectionLog "Erreur générale détection installés : $($_.Exception.Message)" "Error"
+        return @()
     }
 }
 
-function Write-PromptLogo {
-    $logo = @"
-    ╔══════════════════════════════════════╗
-    ║           UpdatesFaciles             ║
-    ║     Assistant de gestion logiciels   ║
-    ║              v1.0.0                  ║
-    ╚══════════════════════════════════════╝
-"@
-    Write-Host $logo -ForegroundColor Cyan
-}
+# =============================================================================
+# DÉTECTION LOGICIELS PORTABLES
+# =============================================================================
 
-# === EXÉCUTION PRINCIPALE ===
-try {
-    Write-PromptLogo
-    Write-SetupMessage "Début de l'installation d'UpdatesFaciles" -Type "Info"
+function Get-PortableSoftware {
+    [CmdletBinding()]
+    param(
+        [string[]]$CustomPaths = @()
+    )
     
-    # Vérification des prérequis
-    if (-not (Test-Prerequisites)) {
-        Write-SetupMessage "Prérequis non satisfaits. Installation interrompue." -Type "Error"
-        exit 1
+    if (-not $Script:DetectionConfig.EnablePortableDetection) {
+        Write-DetectionLog "Détection portable désactivée" "Info"
+        return @()
     }
     
-    # Résolution du chemin d'installation
-    $fullInstallPath = Resolve-Path $InstallPath -ErrorAction SilentlyContinue
-    if (-not $fullInstallPath) {
-        $fullInstallPath = $InstallPath
-    }
+    Write-DetectionLog "Début détection logiciels portables" "Info"
+    $portableSoftware = @()
     
-    # Vérification de l'existence du projet
-    if ((Test-Path $fullInstallPath) -and (-not $Force)) {
-        Write-SetupMessage "Le dossier $fullInstallPath existe déjà. Utilisez -Force pour écraser." -Type "Warning"
-        $response = Read-Host "Continuer quand même? (o/N)"
-        if ($response -notmatch "^[oO]") {
-            Write-SetupMessage "Installation annulée par l'utilisateur." -Type "Info"
-            exit 0
+    $allPaths = $Script:StandardPaths.PortableApps + $Script:StandardPaths.CloudSync + $CustomPaths
+    
+    foreach ($basePath in $allPaths) {
+        if (-not (Test-PathSafely $basePath)) {
+            Write-DetectionLog "Chemin portable inexistant : $basePath" "Debug"
+            continue
+        }
+        
+        Write-DetectionLog "Scan dossier portable : $basePath" "Debug"
+        
+        try {
+            $executables = Get-ChildItem -Path $basePath -Recurse -Include "*.exe" -ErrorAction SilentlyContinue |
+                Where-Object { 
+                    $_.Directory.Name -notmatch "^(temp|cache|logs?|backup|unins)" -and
+                    $_.Name -notmatch "^(unins|setup|install)" 
+                } |
+                Select-Object -First 100
+            
+            foreach ($exe in $executables) {
+                try {
+                    $versionInfo = Get-FileVersionSafely $exe.FullName
+                    
+                    $name = if ($versionInfo -and $versionInfo.ProductName) { 
+                        $versionInfo.ProductName 
+                    } else { 
+                        $exe.BaseName 
+                    }
+                    
+                    $version = if ($versionInfo -and $versionInfo.ProductVersion) { 
+                        $versionInfo.ProductVersion 
+                    } else { 
+                        "Inconnu" 
+                    }
+                    
+                    $publisher = if ($versionInfo -and $versionInfo.CompanyName) { 
+                        $versionInfo.CompanyName 
+                    } else { 
+                        "Inconnu" 
+                    }
+                    
+                    $sourceType = if ($basePath -match "(OneDrive|Google Drive|Dropbox)") { "Cloud" } else { "Portable" }
+                    
+                    $software = New-SoftwareApp -Name $name `
+                                              -Version $version `
+                                              -Publisher $publisher `
+                                              -Path $exe.DirectoryName `
+                                              -Source $sourceType `
+                                              -State "Detected"
+                    
+                    $portableSoftware += $software
+                }
+                catch {
+                    Write-DetectionLog "Erreur traitement portable $($exe.FullName) : $($_.Exception.Message)" "Debug"
+                }
+            }
+        }
+        catch {
+            Write-DetectionLog "Erreur scan dossier $basePath : $($_.Exception.Message)" "Error"
         }
     }
     
-    # Création de la structure
-    if (-not (New-ProjectStructure -Path $fullInstallPath)) {
-        Write-SetupMessage "Erreur lors de la création de la structure. Installation interrompue." -Type "Error"
-        exit 1
-    }
-    
-    # Installation des modules
-    Install-RequiredModules
-    
-    # Création du module helper
-    New-HelperModule -ProjectPath $fullInstallPath
-    
-    # Résumé final
-    Show-InstallationSummary -ProjectPath $fullInstallPath
-    
-    Write-SetupMessage "`nInstallation terminée avec succès!" -Type "Success"
-}
-catch {
-    Write-SetupMessage "Erreur fatale: $($_.Exception.Message)" -Type "Error"
-    Write-SetupMessage "Stack trace: $($_.ScriptStackTrace)" -Type "Error"
-    exit 1
+    Write-DetectionLog "Détection portables terminée : $($portableSoftware.Count) logiciels trouvés" "Info"
+    return $portableSoftware
 }
 
+# =============================================================================
+# DÉTECTION RACCOURCIS
+# =============================================================================
 
-# Dans P:\Git\UpdatesFaciles\Setup-UpdatesFaciles.ps1
-$filesToCreate = @{
-    "UpdatesFaciles_Prompt.txt" = "P:\Git\UpdatesFaciles\UpdatesFaciles_Prompt.txt"
-    # Autres fichiers...
+function Get-ShortcutSoftware {
+    [CmdletBinding()]
+    param()
+    
+    if (-not $Script:DetectionConfig.EnableShortcutDetection) {
+        Write-DetectionLog "Détection raccourcis désactivée" "Info"
+        return @()
+    }
+    
+    Write-DetectionLog "Début détection logiciels via raccourcis" "Info"
+    $shortcutSoftware = @()
+    
+    try {
+        $shell = New-Object -ComObject WScript.Shell
+    }
+    catch {
+        Write-DetectionLog "Impossible de créer l'objet WScript.Shell : $($_.Exception.Message)" "Error"
+        return @()
+    }
+    
+    foreach ($location in $Script:StandardPaths.Shortcuts.Values) {
+        if (-not (Test-PathSafely $location)) {
+            Write-DetectionLog "Dossier raccourcis inexistant : $location" "Debug"
+            continue
+        }
+        
+        Write-DetectionLog "Scan raccourcis : $location" "Debug"
+        
+        try {
+            $shortcuts = Get-ChildItem -Path $location -Recurse -Include "*.lnk" -ErrorAction SilentlyContinue |
+                Select-Object -First 50
+            
+            foreach ($shortcut in $shortcuts) {
+                try {
+                    $link = $shell.CreateShortcut($shortcut.FullName)
+                    $targetPath = $link.TargetPath
+                    
+                    if ($targetPath -and (Test-PathSafely $targetPath) -and $targetPath -match "\.exe$") {
+                        $versionInfo = Get-FileVersionSafely $targetPath
+                        
+                        $name = if ($versionInfo -and $versionInfo.ProductName) { 
+                            $versionInfo.ProductName 
+                        } else { 
+                            $shortcut.BaseName 
+                        }
+                        
+                        $version = if ($versionInfo -and $versionInfo.ProductVersion) { 
+                            $versionInfo.ProductVersion 
+                        } else { 
+                            "Inconnu" 
+                        }
+                        
+                        $publisher = if ($versionInfo -and $versionInfo.CompanyName) { 
+                            $versionInfo.CompanyName 
+                        } else { 
+                            "Inconnu" 
+                        }
+                        
+                        $software = New-SoftwareApp -Name $name `
+                                                  -Version $version `
+                                                  -Publisher $publisher `
+                                                  -Path (Split-Path $targetPath -Parent) `
+                                                  -Source "Shortcut" `
+                                                  -State "Detected"
+                        
+                        $shortcutSoftware += $software
+                    }
+                }
+                catch {
+                    Write-DetectionLog "Erreur traitement raccourci $($shortcut.FullName) : $($_.Exception.Message)" "Debug"
+                }
+            }
+        }
+        catch {
+            Write-DetectionLog "Erreur scan raccourcis $location : $($_.Exception.Message)" "Error"
+        }
+    }
+    
+    try {
+        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($shell) | Out-Null
+    }
+    catch {
+        Write-DetectionLog "Erreur nettoyage objet COM : $($_.Exception.Message)" "Debug"
+    }
+    
+    Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
+    return $shortcutSoftware
 }
-foreach ($file in $filesToCreate.GetEnumerator()) {
-    if (-not (Test-Path $file.Value)) {
-        New-Item -Path $file.Value -ItemType File -Force
+
+# =============================================================================
+# FONCTION PRINCIPALE DE DÉTECTION
+# =============================================================================
+
+function Invoke-SoftwareDetection {
+    [CmdletBinding()]
+    param(
+        [switch]$IncludeInstalled = $true,
+        [switch]$IncludePortable = $true,
+        [switch]$IncludeShortcuts = $true,
+        [string[]]$CustomPortablePaths = @(),
+        [switch]$DebugMode
+    )
+    
+    $Script:DetectionConfig.DebugMode = $DebugMode.IsPresent
+    
+    Write-DetectionLog "=== DÉBUT DÉTECTION COMPLÈTE ===" "Info"
+    Write-DetectionLog "Options : Installés=$IncludeInstalled, Portables=$IncludePortable, Raccourcis=$IncludeShortcuts" "Info"
+    
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    $allSoftware = @()
+    
+    try {
+        if ($IncludeInstalled) {
+            Write-DetectionLog "--- Phase 1 : Logiciels installés ---" "Info"
+            $installed = Get-InstalledSoftware
+            $allSoftware += $installed
+            Write-DetectionLog "Phase 1 terminée : $($installed.Count) logiciels installés" "Info"
+        }
+        
+        if ($IncludePortable) {
+            Write-DetectionLog "--- Phase 2 : Logiciels portables ---" "Info"
+            $portable = Get-PortableSoftware -CustomPaths $CustomPortablePaths
+            $allSoftware += $portable
+            Write-DetectionLog "Phase 2 terminée : $($portable.Count) logiciels portables" "Info"
+        }
+        
+        if ($IncludeShortcuts) {
+            Write-DetectionLog "--- Phase 3 : Raccourcis ---" "Info"
+            $shortcuts = Get-ShortcutSoftware
+            $allSoftware += $shortcuts
+            Write-DetectionLog "Phase 3 terminée : $($shortcuts.Count) raccourcis" "Info"
+        }
+        
+        Write-DetectionLog "--- Phase 4 : Dédoublonnage ---" "Info"
+        $uniqueSoftware = Remove-DuplicateSoftware $allSoftware
+        
+        $stopwatch.Stop()
+        
+        Write-DetectionLog "=== DÉTECTION TERMINÉE ===" "Info"
+        Write-DetectionLog "Total brut : $($allSoftware.Count) éléments" "Info"
+        Write-DetectionLog "Total unique : $($uniqueSoftware.Count) logiciels" "Info"
+        Write-DetectionLog "Durée : $([math]::Round($stopwatch.Elapsed.TotalSeconds, 2)) secondes" "Info"
+        
+        return $uniqueSoftware
+    }
+    catch {
+        $stopwatch.Stop()
+        Write-DetectionLog "ERREUR CRITIQUE détection : $($_.Exception.Message)" "Error"
+        Write-DetectionLog "Stack trace : $($_.ScriptStackTrace)" "Error"
+        return @()
     }
 }
 
-foreach ($file in $filesToCreate.GetEnumerator()) {
-    if (-not (Test-Path $file.Value)) {
-        New-Item -Path $file.Value -ItemType File -Force
-        Write-Host "Création de $($file.Key) à $($file.Value)" -ForegroundColor Green
-    } else {
-        Write-Host "$($file.Key) existe déjà à $($file.Value)" -ForegroundColor Cyan
+# =============================================================================
+# DÉDOUBLONNAGE ET CONSOLIDATION
+# =============================================================================
+
+function Remove-DuplicateSoftware {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [array]$SoftwareList
+    )
+    
+    Write-DetectionLog "Début dédoublonnage de $($SoftwareList.Count) éléments" "Debug"
+    
+    $grouped = $SoftwareList | Group-Object -Property Name | Where-Object { $_.Name -and $_.Name -ne "Inconnu" }
+    $uniqueSoftware = @()
+    
+    foreach ($group in $grouped) {
+        try {
+            $bestSoftware = $group.Group | 
+                Sort-Object @{Expression={($_.Publisher -ne "Inconnu")}; Descending=$true},
+                           @{Expression={($_.Version -ne "Inconnu")}; Descending=$true},
+                           @{Expression={($_.Path -ne "Inconnu")}; Descending=$true} |
+                Select-Object -First 1
+            
+            $sources = ($group.Group | Select-Object -ExpandProperty Source -Unique) -join ", "
+            $bestSoftware.Source = $sources
+            
+            $uniqueSoftware += $bestSoftware
+        }
+        catch {
+            Write-DetectionLog "Erreur dédoublonnage groupe '$($group.Name)' : $($_.Exception.Message)" "Error"
+        }
     }
+    
+    Write-DetectionLog "Dédoublonnage terminé : $($uniqueSoftware.Count) logiciels uniques" "Debug"
+    return $uniqueSoftware
 }
+
+# =============================================================================
+# FONCTIONS DE CONFIGURATION
+# =============================================================================
+
+function Set-DetectionConfig {
+    [CmdletBinding()]
+    param(
+        [int]$TimeoutSeconds,
+        [bool]$EnablePortableDetection,
+        [bool]$EnableShortcutDetection,
+        [bool]$DebugMode
+    )
+    
+    if ($PSBoundParameters.ContainsKey('TimeoutSeconds')) {
+        $Script:DetectionConfig.TimeoutSeconds = $TimeoutSeconds
+    }
+    if ($PSBoundParameters.ContainsKey('EnablePortableDetection')) {
+        $Script:DetectionConfig.EnablePortableDetection = $EnablePortableDetection
+    }
+    if ($PSBoundParameters.ContainsKey('EnableShortcutDetection')) {
+        $Script:DetectionConfig.EnableShortcutDetection = $EnableShortcutDetection
+    }
+    if ($PSBoundParameters.ContainsKey('DebugMode')) {
+        $Script:DetectionConfig.DebugMode = $DebugMode
+    }
+    
+    Write-DetectionLog "Configuration mise à jour" "Info"
+}
+
+function Get-DetectionConfig {
+    return $Script:DetectionConfig
+}
+
+# =============================================================================
+# EXPORT DES FONCTIONS
+# =============================================================================
+
+Export-ModuleMember -Function @(
+    'Invoke-SoftwareDetection',
+    'Get-InstalledSoftware', 
+    'Get-PortableSoftware',
+    'Get-ShortcutSoftware',
+    'Set-DetectionConfig',
+    'Get-DetectionConfig',
+    'Remove-DuplicateSoftware'
+)
