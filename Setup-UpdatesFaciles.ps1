@@ -331,3 +331,23 @@ catch {
     exit 1
 }
 
+
+# Dans P:\Git\UpdatesFaciles\Setup-UpdatesFaciles.ps1
+$filesToCreate = @{
+    "UpdatesFaciles_Prompt.txt" = "P:\Git\UpdatesFaciles\UpdatesFaciles_Prompt.txt"
+    # Autres fichiers...
+}
+foreach ($file in $filesToCreate.GetEnumerator()) {
+    if (-not (Test-Path $file.Value)) {
+        New-Item -Path $file.Value -ItemType File -Force
+    }
+}
+
+foreach ($file in $filesToCreate.GetEnumerator()) {
+    if (-not (Test-Path $file.Value)) {
+        New-Item -Path $file.Value -ItemType File -Force
+        Write-Host "Création de $($file.Key) à $($file.Value)" -ForegroundColor Green
+    } else {
+        Write-Host "$($file.Key) existe déjà à $($file.Value)" -ForegroundColor Cyan
+    }
+}
