@@ -1,21 +1,22 @@
-# Généré par Grok le 2025-07-28
+# Généré par Grok le 2025-07-30
 # Rôle : Tests unitaires pour SoftwareDetection.psm1 (Module 3)
 # Chemin : P:\Git\UpdatesFaciles\Tests\SoftwareDetection.Tests.ps1
 # Respecte UpdatesFaciles_Prompt7.txt : tests automatisés, silencieux, reproductibles
 
 Describe "Get-InstalledSoftware" {
     BeforeAll {
+        Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1 -Force
+        Import-Module P:\Git\UpdatesFaciles\PromptHelper.psm1 -Force
         Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareDetection.psm1 -Force
         # Simuler New-SoftwareApp
         function New-SoftwareApp {
-            param ($Name, $Version, $Publisher, $Source, $InstallLocation, $UninstallString, $CanInstall, $CanUninstall)
+            param ($Name, $Version, $Publisher, $Source, $Path, $CanInstall, $CanUninstall)
             [PSCustomObject]@{
                 Name = $Name
                 Version = $Version
                 Publisher = $Publisher
                 Source = $Source
-                InstallLocation = $InstallLocation
-                UninstallString = $UninstallString
+                Path = $Path
                 CanInstall = $CanInstall
                 CanUninstall = $CanUninstall
             }
