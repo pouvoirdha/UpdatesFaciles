@@ -8,8 +8,10 @@
     Conforme aux exigences UpdatesFaciles_Prompt.txt
 .NOTES
     Fichier : Sources/SoftwareDetection.psm1
-    Version : 3.1
+    Version : 3.3
     Auteur : UpdatesFaciles Team
+    Date : 2025-07-30
+    Notes : Correction Source (Registry->Installé, Shortcut->Raccourci), State (Detected->Inconnu), ajout Enable-CloudSyncDetection, CloudSync vidé
 #>
 
 # Vérification des dépendances
@@ -39,16 +41,9 @@ $Script:StandardPaths = @{
     )
     PortableApps = @(
         "C:\PortableApps",
-        "$env:USERPROFILE\PortableApps",
-        "$env:OneDrive\PortableApps",
-        "$env:OneDriveCommercial\PortableApps"
+        "$env:USERPROFILE\PortableApps"
     )
-    CloudSync = @(
-        "$env:OneDrive",
-        "$env:OneDriveCommercial", 
-        "$env:USERPROFILE\Google Drive",
-        "$env:USERPROFILE\Dropbox"
-    )
+    CloudSync = @() # Chemins cloud désactivés par défaut
     Shortcuts = @{
         Desktop = "$env:USERPROFILE\Desktop"
         StartMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
@@ -62,7 +57,7 @@ $Script:RegistryPaths = @(
     "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 )
 
-Write-Host "Module SoftwareDetection chargé - Version 3.1" -ForegroundColor Green
+Write-Host "Module SoftwareDetection chargé - Version 3.3" -ForegroundColor Green
 
 # =============================================================================
 # FONCTIONS UTILITAIRES
@@ -159,8 +154,8 @@ function Get-InstalledSoftware {
                                                   -Version ($item.DisplayVersion -replace "^\s*$", "Inconnu") `
                                                   -Publisher ($item.Publisher -replace "^\s*$", "Inconnu") `
                                                   -Path ($item.InstallLocation -replace "^\s*$", "Inconnu") `
-                                                  -Source "Registry" `
-                                                  -State "Detected"
+                                                  -Source "Installé" `
+                                                  -State "Inconnu"
                         
                         $installedSoftware += $software
                         
@@ -252,7 +247,7 @@ function Get-PortableSoftware {
                                               -Publisher $publisher `
                                               -Path $exe.DirectoryName `
                                               -Source $sourceType `
-                                              -State "Detected"
+                                              -State "Inconnu"
                     
                     $portableSoftware += $software
                 }
@@ -336,8 +331,8 @@ function Get-ShortcutSoftware {
                                                   -Version $version `
                                                   -Publisher $publisher `
                                                   -Path (Split-Path $targetPath -Parent) `
-                                                  -Source "Shortcut" `
-                                                  -State "Detected"
+                                                  -Source "Raccourci" `
+                                                  -State "Inconnu"
                         
                         $shortcutSoftware += $software
                     }
@@ -361,6 +356,26 @@ function Get-ShortcutSoftware {
     
     Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
     return $shortcutSoftware
+}
+
+# =============================================================================
+# CONFIGURATION DES CHEMINS CLOUD
+# =============================================================================
+
+function Enable-CloudSyncDetection {
+    [CmdletBinding()]
+    param(
+        [switch]$OneDrive,
+        [switch]$GoogleDrive,
+        [switch]$Dropbox
+    )
+    
+    $cloudPaths = @()
+    if ($OneDrive) { $cloudPaths += "$env:OneDrive" }
+    if ($GoogleDrive) { $cloudPaths += "$env:USERPROFILE\Google Drive" }
+    if ($Dropbox) { $cloudPaths += "$env:USERPROFILE\Dropbox" }
+    $Script:StandardPaths.CloudSync = $cloudPaths
+    Write-DetectionLog "Cloud sync activé : $($cloudPaths -join ', ')" "Info"
 }
 
 # =============================================================================
@@ -509,5 +524,6 @@ Export-ModuleMember -Function @(
     'Get-ShortcutSoftware',
     'Set-DetectionConfig',
     'Get-DetectionConfig',
-    'Remove-DuplicateSoftware'
+    'Remove-DuplicateSoftware',
+    'Enable-CloudSyncDetection'
 )

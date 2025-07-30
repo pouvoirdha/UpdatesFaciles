@@ -1,0 +1,4 @@
+logs.txt
+*.log
+Sources/*_backup_*.psm*
+Tests/*_backup_*.ps1
