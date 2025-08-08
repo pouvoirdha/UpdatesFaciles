@@ -8,7 +8,7 @@
     Conforme aux exigences UpdatesFaciles_Prompt.txt
 .NOTES
     Fichier : Sources/SoftwareDetection.psm1
-    Version : 3.0
+    Version : 3.5
     Auteur : UpdatesFaciles Team
     Date : 2025-08-08
     Notes : Correction mock CreateShortcut pour Get-ShortcutSoftware, gestion conditionnelle ReleaseComObject
@@ -21,8 +21,7 @@ if (-not (Test-Path P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1)) {
 }
 Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1 -Force
 
-$Script:ModuleVersion = "3.0"
-Write-Host "Module SoftwareDetection chargé - Version $Script:ModuleVersion" -ForegroundColor Green
+Write-Host "Module SoftwareDetection chargé - Version 3.5" -ForegroundColor Green
 
 # =============================================================================
 # VARIABLES GLOBALES ET CONFIGURATION
@@ -36,7 +35,7 @@ $Script:DetectionConfig = @{
     EnableUpdateCheck = $true
     DebugMode = $false
 }
-$Script:LogBuffer = [System.Collections.ArrayList]::new()
+$Script:LogBuffer = @()
 
 $Script:StandardPaths = @{
     ProgramFiles = @(
@@ -66,7 +65,6 @@ $Script:RegistryPaths = @(
 # =============================================================================
 
 function Write-DetectionLog {
-    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message,
@@ -74,11 +72,12 @@ function Write-DetectionLog {
         [ValidateSet("Info", "Debug", "Error")]
         [string]$Level
     )
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] $Message"
-    $null = $Script:LogBuffer.Add($logEntry)
-    if ($Level -eq "Debug" -and -not $Script:DetectionConfig.DebugMode) { return }
-    if ($Level -eq "Error") { Write-Error $logEntry } elseif ($Level -eq "Debug") { Write-Debug $logEntry } else { Write-Host $logEntry }
+    if ($Level -eq "Debug" -and $Message -notmatch "Logiciel ajouté") {
+        if (-not $Script:DetectionConfig.DebugMode) { return }
+    }
+    $logEntry = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [$Level] $Message"
+    $Script:LogBuffer += $logEntry
+    Write-Host $logEntry
 }
 
 function Test-PathSafely {
@@ -291,7 +290,7 @@ function Get-PortableSoftware {
 function Get-ShortcutSoftware {
     [CmdletBinding()]
     param()
-    
+
     if (-not $Script:DetectionConfig.EnableShortcutDetection) {
         Write-DetectionLog "Détection raccourcis désactivée" "Info"
         return @()
@@ -315,7 +314,9 @@ function Get-ShortcutSoftware {
     $systemFolders = @(
         "C:\Windows",
         "C:\Windows\System32",
-        "C:\Windows\SysWOW64"
+        "C:\Windows\SysWOW64",
+        "C:\Program Files\Windows",
+        "C:\Program Files (x86)\Windows"
     )
 
     # Termes à exclure dans les noms de raccourcis
@@ -399,6 +400,13 @@ function Get-ShortcutSoftware {
                 } else { 
                     "Inconnu" 
                 }
+
+                # Exclure les logiciels avec version inconnue
+                if ($version -eq "Inconnu") {
+                    Write-DetectionLog "Logiciel ignoré (version inconnue) : $name" "Debug"
+                    continue
+                }
+
                 $publisher = if ($versionInfo -and $versionInfo.CompanyName) { 
                     $versionInfo.CompanyName 
                 } else { 
@@ -421,6 +429,24 @@ function Get-ShortcutSoftware {
         }
     }
 
+    # Vérification des doublons
+    $duplicates = $shortcutSoftware | Group-Object -Property Name | Where-Object { $_.Count -gt 1 }
+    if ($duplicates) {
+        foreach ($dup in $duplicates) {
+            Write-DetectionLog "Avertissement : Doublons détectés pour '$($dup.Name)' ($($dup.Count) occurrences)" "Warning"
+        }
+    }
+
+    # Analyse des logs pour anomalies
+    $productNameCounts = $shortcutSoftware | Group-Object -Property Name | Where-Object { $_.Count -gt 1 }
+    if ($productNameCounts) {
+        Write-DetectionLog "Analyse : $(($productNameCounts | Measure-Object).Count) logiciels avec des noms dupliqués détectés" "Info"
+        foreach ($count in $productNameCounts) {
+            Write-DetectionLog "Nom '$($count.Name)' apparaît $($count.Count) fois" "Info"
+        }
+    }
+
+    # Libération de l'objet COM
     try {
         if ($shell -is [System.__ComObject]) {
             Write-DetectionLog "Tentative de libération de l'objet COM WScript.Shell" "Debug"
@@ -435,9 +461,17 @@ function Get-ShortcutSoftware {
     }
 
     # Exporter les logs en JSON
-    $logEntries = Get-DetectionLog
-    if ($logEntries) {
-        $logEntries | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
+    if ($Script:LogBuffer) {
+        $Script:LogBuffer | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json" -Force
+    } else {
+        Write-DetectionLog "Avertissement : LogBuffer est vide ou non défini, exportation JSON ignorée" "Warning"
+    }
+
+    # Exporter les résultats en JSON
+    if ($shortcutSoftware) {
+        $shortcutSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json" -Force
+    } else {
+        Write-DetectionLog "Avertissement : Aucun logiciel détecté, exportation JSON des résultats ignorée" "Warning"
     }
 
     Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
@@ -523,11 +557,6 @@ function Invoke-SoftwareDetection {
         Write-DetectionLog "Total brut : $($allSoftware.Count) éléments" "Info"
         Write-DetectionLog "Total unique : $($uniqueSoftware.Count) logiciels" "Info"
         Write-DetectionLog "Durée : $([math]::Round($stopwatch.Elapsed.TotalSeconds, 2)) secondes" "Info"
-        
-        # Export des logiciels uniques en JSON
-        if ($uniqueSoftware) {
-            $uniqueSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-        }
         
         return $uniqueSoftware
     }
@@ -638,12 +667,6 @@ function Get-DetectionConfig {
     return $Script:DetectionConfig
 }
 
-function Get-DetectionLog {
-    [CmdletBinding()]
-    param()
-    return $Script:LogBuffer
-}
-
 # =============================================================================
 # EXPORT DES FONCTIONS
 # =============================================================================
@@ -656,8 +679,13 @@ Export-ModuleMember -Function @(
     'Set-DetectionConfig',
     'Get-DetectionConfig',
     'Remove-DuplicateSoftware',
-    'Enable-CloudSyncDetection',
-    'Get-DetectionLog'
+    'Enable-CloudSyncDetection'
 )
 
 Write-Host "Fonctions disponibles : $(Get-Command -Module SoftwareDetection | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue)" -ForegroundColor Green
+
+function Get-DetectionLog {
+    [CmdletBinding()]
+    param()
+    return $Script:LogBuffer
+}

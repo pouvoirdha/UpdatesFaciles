@@ -1,0 +1,1062 @@
+[
+  {
+    "Name": "Google Earth Pro",
+    "Version": "7.3.6.10201",
+    "Publisher": "Google",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "PowerShell 7.5.2.0-x64",
+    "Version": "7.5.2.0",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Edge",
+    "Version": "138.0.3351.121",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Windows SDK AddOn",
+    "Version": "10.1.0.0",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Lenovo Service Bridge",
+    "Version": "5.0.2.18",
+    "Publisher": "Lenovo",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Lenovo\\Lenovo Service Bridge\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Office Famille et Petite Entreprise 2016 - fr-fr",
+    "Version": "16.0.19029.20136",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Microsoft Office",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Windows Software Development Kit - Windows 10.0.19041.5609",
+    "Version": "10.1.19041.5609",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Intel® Processor Identification Utility 8.0.43",
+    "Version": "8.0.43",
+    "Publisher": "Intel Corporation",
+    "Path": "C:\\Program Files (x86)\\Intel Corporation\\Intel Processor Identification Utility\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Opera Stable 120.0.5543.161",
+    "Version": "120.0.5543.161",
+    "Publisher": "Opera Software",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Opera",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Cozy Drive 3.42.0",
+    "Version": "3.42.0",
+    "Publisher": "Cozy Cloud",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Canon IJ Scan Utility",
+    "Version": "1.6.1.2",
+    "Publisher": "Canon Inc.",
+    "Path": "C:\\Program Files (x86)\\Canon\\IJ Scan Utility",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Python 3.13.5 (64-bit)",
+    "Version": "3.13.5150.0",
+    "Publisher": "Python Software Foundation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "AirDroid 3.8.0.4",
+    "Version": "3.8.0.4",
+    "Publisher": "AirDroid",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "BlueStacks",
+    "Version": "5.22.100.1024",
+    "Publisher": "now.gg, Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Notepad++ (64-bit x64)",
+    "Version": "8.8.3",
+    "Publisher": "Notepad++ Team",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Epic Online Services",
+    "Version": "2.9.0",
+    "Publisher": "Epic Games, Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Logiciel Intel® PROSet/Wireless",
+    "Version": "21.10.1.0u",
+    "Publisher": "Intel Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "VLC media player",
+    "Version": "3.0.21",
+    "Publisher": "VideoLAN",
+    "Path": "C:\\Program Files\\VideoLAN\\VLC",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Visual C++ 2015-2022 Redistributable (x64) - 14.44.35211",
+    "Version": "14.44.35211.0",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Sucrose Wallpaper Engine",
+    "Version": "25.7.28.0",
+    "Publisher": "Taiizor",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Sucrose",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Intel(R) Network Connections Drivers",
+    "Version": "30.0",
+    "Publisher": "Intel",
+    "Path": "C:\\WINDOWS\\system32",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "NVIDIA Pilote audio HD 1.4.3.2",
+    "Version": "1.4.3.2",
+    "Publisher": "NVIDIA Corporation",
+    "Path": "C:\\Program Files\\NVIDIA Corporation\\Installer2\\HDAudio.Driver.{CB170E0F-0E7A-46D6-91FC-639A2C48AF6D}",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft ASP.NET Core 8.0.18 - Shared Framework (x86)",
+    "Version": "8.0.18.25317",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "NVIDIA RTX Desktop Manager 205.28",
+    "Version": "205.28",
+    "Publisher": "NVIDIA Corporation",
+    "Path": "C:\\Program Files\\NVIDIA Corporation\\nview",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "NVIDIA Pilote graphique 573.06",
+    "Version": "573.06",
+    "Publisher": "NVIDIA Corporation",
+    "Path": "C:\\Program Files\\NVIDIA Corporation\\Installer2\\Display.Driver.{B84A4FDD-0ABB-4710-93F6-73C4D26077A1}",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "CanoScan LiDE 220 Scanner Driver",
+    "Version": "1.04",
+    "Publisher": "Canon Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "eSpeak NG Text-to-Speech 64-bit",
+    "Version": "1.51.0",
+    "Publisher": "eSpeak Community",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "UCheck version 6.3.1.0",
+    "Version": "6.3.1.0",
+    "Publisher": "Adlice Software",
+    "Path": "C:\\Program Files\\UCheck\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Samsung NVM Express Driver",
+    "Version": "3.3.0.2003",
+    "Publisher": "Samsung Electronics",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Logiciel de base du périphérique HP ColorLaserJet M255-M256",
+    "Version": "44.11.2784.22199",
+    "Publisher": "HP Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "SteelSeries GG 91.0.0",
+    "Version": "91.0.0",
+    "Publisher": "SteelSeries ApS",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "PowerToys (Preview) x64",
+    "Version": "0.92.1",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Bitwarden",
+    "Version": "2025.7.0",
+    "Publisher": "Bitwarden Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Logiciel Thunderbolt™",
+    "Version": "17.4.80.550",
+    "Publisher": "Intel Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Windows Desktop Runtime - 9.0.7 (x64)",
+    "Version": "9.0.7.35017",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Perplexity 1.1.3",
+    "Version": "1.1.3",
+    "Publisher": "Perplexity",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Visual C++ 2015-2022 Redistributable (x86) - 14.44.35211",
+    "Version": "14.44.35211.0",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Windows Desktop Runtime - 8.0.18 (x64)",
+    "Version": "8.0.18.35017",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Intel(R) Wireless Bluetooth(R)",
+    "Version": "23.140.0.5",
+    "Publisher": "Intel Corporation",
+    "Path": "C:\\Program Files (x86)\\Intel\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Adlice Protect version 16.2.3.0",
+    "Version": "16.2.3.0",
+    "Publisher": "Adlice Software",
+    "Path": "C:\\Program Files\\RogueKiller\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Everything 1.4.1.1027 (x64)",
+    "Version": "1.4.1.1027",
+    "Publisher": "voidtools",
+    "Path": "C:\\Program Files\\Everything",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft .NET SDK 8.0.412 (x64)",
+    "Version": "8.4.1225.32301",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "7-Zip 25.00 (x64)",
+    "Version": "25.00",
+    "Publisher": "Igor Pavlov",
+    "Path": "C:\\Program Files\\7-Zip\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "AutoHotkey",
+    "Version": "2.0.19",
+    "Publisher": "AutoHotkey Foundation LLC",
+    "Path": "C:\\Program Files\\AutoHotkey",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Python Launcher",
+    "Version": "3.13.5150.0",
+    "Publisher": "Python Software Foundation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Visual Studio Build Tools 2019",
+    "Version": "16.11.49",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Visual Studio Installer",
+    "Version": "3.14.2082.42463",
+    "Publisher": "Microsoft Corporation",
+    "Path": "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\"",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "BlueStacks Services",
+    "Version": "3.0.9",
+    "Publisher": "now.gg, Inc.",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Python Launcher",
+    "Version": "3.13.3150.0",
+    "Publisher": "Python Software Foundation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "pCloud Drive",
+    "Version": "4.1.13.0",
+    "Publisher": "pCloud International AG",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Mozilla Maintenance Service",
+    "Version": "128.11.1",
+    "Publisher": "Mozilla",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft OneDrive",
+    "Version": "25.137.0715.0001",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "NVIDIA RTX Experience 1.4.1.11",
+    "Version": "3.25.5.9",
+    "Publisher": "NVIDIA Corporation",
+    "Path": "C:\\Program Files\\NVIDIA Corporation\\Installer2\\Display.QuadroExperience.{5E541C37-D5FA-4454-968B-E8DF13E2FB1C}",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Lenovo System Update",
+    "Version": "5.08.03.59",
+    "Publisher": "Lenovo",
+    "Path": "C:\\Program Files (x86)\\Lenovo\\System Update\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Epic Games Launcher",
+    "Version": "1.3.150.0",
+    "Publisher": "Epic Games, Inc.",
+    "Path": "D:\\Program Files (x86)\\Epic Games\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Windows Desktop Runtime - 8.0.18 (x86)",
+    "Version": "8.0.18.35017",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Node.js",
+    "Version": "22.18.0",
+    "Publisher": "Node.js Foundation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "UniGetUI",
+    "Version": "3.3.1",
+    "Publisher": "Martí Climent",
+    "Path": "C:\\Program Files\\UniGetUI\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Intel® Driver & Support Assistant",
+    "Version": "25.3.24.7",
+    "Publisher": "Intel",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Windows Desktop Runtime - 9.0.4 (x64)",
+    "Version": "9.0.4.34714",
+    "Publisher": "Microsoft Corporation",
+    "Path": "Inconnu",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Patch My PC Home Updater",
+    "Version": "5.3.0.0",
+    "Publisher": "Patch My PC",
+    "Path": "C:\\Program Files\\Patch My PC\\Patch My PC Home Updater\\",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Opera Stable 116.0.5366.71",
+    "Version": "116.0.5366.71",
+    "Publisher": "Opera Software",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Opera",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Mozilla Thunderbird (x64 fr)",
+    "Version": "140.1.0",
+    "Publisher": "Mozilla",
+    "Path": "C:\\Program Files\\Mozilla Thunderbird",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Mozilla Firefox (x64 en-US)",
+    "Version": "141.0",
+    "Publisher": "Mozilla",
+    "Path": "C:\\Program Files\\Mozilla Firefox",
+    "Source": "Installé",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Everything",
+    "Version": "1.4.1.1027",
+    "Publisher": "voidtools",
+    "Path": "C:\\Program Files\\Everything",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "HP Digital Imaging",
+    "Version": "044.011.2784.22199",
+    "Publisher": "HP Inc.",
+    "Path": "C:\\Program Files\\HP\\HP ColorLaserJet M255-M256\\Bin",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "PowerShell",
+    "Version": "7.5.2 SHA: d1a57af02c719f2f1695425f5124bbbf218dbf77+d1a57af02c719f2f1695425f5124bbbf218dbf77",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files\\PowerShell\\7",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Telegram Desktop",
+    "Version": "5.16.4.0",
+    "Publisher": "Telegram FZ-LLC",
+    "Path": "P:\\Portable\\Internet\\Telegram",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Ketarin",
+    "Version": "1.8.11.0",
+    "Publisher": "Canneverbe Limited",
+    "Path": "P:\\Portable\\LiberKey\\MyApps\\SyMenu\\ProgramFiles\\SPSSuite\\SyMenuSuite\\Ketarin_sps",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "files-preview",
+    "Version": "Inconnu",
+    "Publisher": "Inconnu",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Microsoft\\WindowsApps",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Captvty",
+    "Version": "3.0 Bêta",
+    "Publisher": "Inconnu",
+    "Path": "C:\\Portable\\captvty-3.0.0.65424",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Lenovo System Update",
+    "Version": "5, 08, 03, 59",
+    "Publisher": "Inconnu",
+    "Path": "C:\\Program Files (x86)\\Lenovo\\System Update",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Firefox",
+    "Version": "141.0",
+    "Publisher": "Mozilla Corporation",
+    "Path": "C:\\Program Files\\Mozilla Firefox",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Sucrose Wallpaper Engine",
+    "Version": "25.07.28+6f7b95da1c5849e8014bfcff4997f6c62bd9b1fc",
+    "Publisher": "Taiizor",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Sucrose\\Sucrose.Launcher",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "LocalSend",
+    "Version": "1.17.0+58",
+    "Publisher": "Tien Do Nam",
+    "Path": "P:\\Portable\\Transfert\\LocalSend-1.16.1-windows-x86-64",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "PortableApps.com Platform",
+    "Version": "30.0.2.0",
+    "Publisher": "PortableApps.com",
+    "Path": "P:\\Portable\\PortableApps\\PortableApps\\PortableApps.com",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "NVIDIA RTX Experience",
+    "Version": "rel_03_23/df962f7",
+    "Publisher": "NVIDIA Corporation",
+    "Path": "C:\\Program Files\\NVIDIA Corporation\\NVIDIA RTX Experience",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "SteelSeries GG",
+    "Version": "91.0.0.0",
+    "Publisher": "SteelSeries A/S",
+    "Path": "C:\\Program Files\\SteelSeries\\GG",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Python",
+    "Version": "3.13.5",
+    "Publisher": "Python Software Foundation",
+    "Path": "C:\\Python313",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Windows Media Player Legacy",
+    "Version": "12.0.26100.1",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Windows Media Player",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Home Updater",
+    "Version": "5.3.0.0+8218f2518d68906b6a6861148e8d213716dce046",
+    "Publisher": "Patch My PC",
+    "Path": "C:\\Program Files\\Patch My PC\\Patch My PC Home Updater",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft OneNote",
+    "Version": "16.0.19029.20136",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "PowerToys",
+    "Version": "0.92.1.0",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\PowerToys",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Perplexity",
+    "Version": "1.1.3.0",
+    "Publisher": "Perplexity",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Perplexity",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Intel(R) Processor Identification Utility",
+    "Version": "8.0.43",
+    "Publisher": "Intel(R) Corporation",
+    "Path": "C:\\Program Files (x86)\\Intel Corporation\\Intel Processor Identification Utility",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Lenovo Service Bridge",
+    "Version": "5.0.2.18",
+    "Publisher": "Lenovo Group Limited",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Lenovo\\Lenovo Service Bridge",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Canon IJ Scan Utility",
+    "Version": "1.6.1.3",
+    "Publisher": "CANON INC.",
+    "Path": "C:\\Program Files (x86)\\Canon\\IJ Scan Utility",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "4K YouTube to MP3",
+    "Version": "25.0",
+    "Publisher": "InterPromo GMBH",
+    "Path": "P:\\Portable\\Lecteur\\Zik\\4kyoutubetomp3\\4kyoutubetomp3",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Rapr",
+    "Version": "0.12.88",
+    "Publisher": "Inconnu",
+    "Path": "P:\\Portable\\Drivers\\DriverStore.Explorer.v0.8.3  nettoyage ancien drivers",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Flow Launcher",
+    "Version": "1.20.1",
+    "Publisher": "Flow Launcher",
+    "Path": "P:\\Portable\\Theme\\Flow-Launcher-Portable\\FlowLauncher",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Thunderbolt(TM) Software",
+    "Version": "17.4.80.41",
+    "Publisher": "Intel Corporation",
+    "Path": "C:\\Program Files (x86)\\Intel\\Thunderbolt Software",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "AirDroid",
+    "Version": "3.8.0.4",
+    "Publisher": "Sand Studio",
+    "Path": "C:\\Program Files (x86)\\AirDroid",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Registry Editor",
+    "Version": "10.0.26100.2308",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\WINDOWS",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Opera Internet Browser",
+    "Version": "120.0.5543.161",
+    "Publisher": "Opera Software",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\Opera",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "BlueStacks",
+    "Version": "5.22.100.1024",
+    "Publisher": "BlueStack Systems",
+    "Path": "C:\\Program Files\\BlueStacks_nxt",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Cozy Drive",
+    "Version": "3.42.0.7340",
+    "Publisher": "Cozy Cloud",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\CozyDrive",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "BlueStacks Store",
+    "Version": "10.42.100.1001",
+    "Publisher": "COMPANY NAME",
+    "Path": "C:\\Program Files (x86)\\BlueStacks X",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Adlice Protect",
+    "Version": "16.2.3.0",
+    "Publisher": "Adlice Software",
+    "Path": "C:\\Program Files\\RogueKiller",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "O&O DeskInfo",
+    "Version": "1.3.1348.271",
+    "Publisher": "O&O Software GmbH",
+    "Path": "P:\\portable\\Theme\\OODeskInfo",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "7-Zip",
+    "Version": "25.00",
+    "Publisher": "Igor Pavlov",
+    "Path": "C:\\Program Files\\7-Zip",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Node.js",
+    "Version": "22.18.0",
+    "Publisher": "Node.js",
+    "Path": "C:\\Program Files\\nodejs",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Microsoft Office",
+    "Version": "16.0.19029.20136",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Program Files (x86)\\Microsoft Office\\root\\Office16",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "4K Video Downloader+",
+    "Version": "25.0",
+    "Publisher": "InterPromo GMBH",
+    "Path": "P:\\Portable\\Lecteur\\VIDEO\\4kvideodownloader_4.4.2\\4kvideodownloader",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "BlueStacks Services",
+    "Version": "3.0.9.173",
+    "Publisher": "now.gg, Inc.",
+    "Path": "C:\\Users\\DERFB\\AppData\\Local\\Programs\\bluestacks-services",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "Visual Studio Code",
+    "Version": "1.102.1",
+    "Publisher": "Microsoft Corporation",
+    "Path": "P:\\Portable\\PROJETS\\VSCode-win32-x64-1.102.1",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  },
+  {
+    "Name": "RAC Pcloud",
+    "Version": "10.0.26100.2308",
+    "Publisher": "Microsoft Corporation",
+    "Path": "C:\\Windows",
+    "Source": "Raccourci",
+    "State": "Inconnu",
+    "CanInstall": false,
+    "CanUninstall": false
+  }
+]

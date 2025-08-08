@@ -27,41 +27,31 @@ Describe "SoftwareDetection Module Tests" {
 
         # Mock pour Get-ChildItem (portables)
         Mock Get-ChildItem {
-            Write-Host "Mock Get-ChildItem (raccourcis) appelé pour Path: $Path"
-            if ($Path -eq "C:\Users\DERFB\Desktop") {
-                $fileInfo = New-Object IO.FileInfo "C:\Users\Public\Desktop\TestApp.lnk"
-                return @(
-                    [PSCustomObject]@{
-                        FullName = $fileInfo.FullName
-                        Name = $fileInfo.Name
-                        BaseName = $fileInfo.BaseName
-                        DirectoryName = $fileInfo.DirectoryName
-                        Extension = $fileInfo.Extension
-                        PSPath = "Microsoft.PowerShell.Core\FileSystem::C:\Users\Public\Desktop\TestApp.lnk"
-                        PSParentPath = "Microsoft.PowerShell.Core\FileSystem::C:\Users\Public\Desktop"
-                        PSDrive = [PSCustomObject]@{ Name = "C"; Provider = "FileSystem" }
-                        PSProvider = [PSCustomObject]@{ Name = "FileSystem" }
-                        Length = 1024
-                        LastWriteTime = (Get-Date)
-                    }
-                )
-            }
-            return @()
-        } -ModuleName SoftwareDetection -ParameterFilter { 
-            $Path -in @(
-                "C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                "C:\Users\DERFB\AppData\Roaming\Microsoft\Windows\Start Menu\Programs",
-                "C:\Users\DERFB\Desktop"
+            Write-Host "Mock Get-ChildItem (portables) appelé pour Path: $Path"
+            $fileInfo = New-Object IO.FileInfo "D:\Portable\TestApp.exe"
+            return @(
+                [PSCustomObject]@{
+                    FullName = $fileInfo.FullName
+                    Name = $fileInfo.Name
+                    BaseName = $fileInfo.BaseName
+                    DirectoryName = $fileInfo.DirectoryName
+                    Extension = $fileInfo.Extension
+                    PSPath = "Microsoft.PowerShell.Core\FileSystem::D:\Portable\TestApp.exe"
+                    PSParentPath = "Microsoft.PowerShell.Core\FileSystem::D:\Portable"
+                    PSDrive = [PSCustomObject]@{ Name = "D"; Provider = "FileSystem" }
+                    PSProvider = [PSCustomObject]@{ Name = "FileSystem" }
+                    Length = 1024
+                    LastWriteTime = (Get-Date)
+                }
             )
-        }
+        } -ModuleName SoftwareDetection -ParameterFilter { $Path -eq "D:\Portable" }
 
         # Mock pour Get-ChildItem (raccourcis)
         Mock Get-ChildItem {
             Write-Host "Mock Get-ChildItem (raccourcis) appelé pour Path: $Path"
-            if ($Path -eq "C:\Users\DERFB\Desktop") {
-                $fileInfo = New-Object IO.FileInfo "C:\Users\Public\Desktop\TestApp.lnk"
-                return @(
-                    [PSCustomObject]@{
+            $fileInfo = New-Object IO.FileInfo "C:\Users\Public\Desktop\TestApp.lnk"
+            return @(
+                [PSCustomObject]@{
                     FullName = $fileInfo.FullName
                     Name = $fileInfo.Name
                     BaseName = $fileInfo.BaseName
@@ -73,15 +63,13 @@ Describe "SoftwareDetection Module Tests" {
                     PSProvider = [PSCustomObject]@{ Name = "FileSystem" }
                     Length = 1024
                     LastWriteTime = (Get-Date)
-                    }
-                )
-            }
-            return @()
+                }
+            )
         } -ModuleName SoftwareDetection -ParameterFilter { 
             $Path -in @(
                 "C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                "C:\Users\DERFB\AppData\Roaming\Microsoft\Windows\Start Menu\Programs",
-                "C:\Users\DERFB\Desktop"
+                "C:\Users\DERFB\Desktop",
+                "C:\Users\DERFB\AppData\Roaming\Microsoft\Windows\Start Menu\Programs"
             )
         }
 
@@ -96,21 +84,18 @@ Describe "SoftwareDetection Module Tests" {
             Write-Host "Mock New-Object appelé avec TypeName: '$TypeName', ComObject: '$ComObject'"
             if ($ComObject -eq "WScript.Shell" -or $TypeName -eq "WScript.Shell") {
                 Write-Host "Mock WScript.Shell activé"
-                $shell = [PSCustomObject]@{
-                    PSTypeName = "Mock.WScript.Shell"
-                }
-                $createShortcutMethod = {
-                    param($Path)
-                    Write-Host "Mock CreateShortcut appelé pour Path: $Path"
-                    Write-Host "Retour de TargetPath: C:\Program Files\TestApp\TestApp.exe"
-                    return [PSCustomObject]@{
-                        TargetPath = "C:\Program Files\TestApp\TestApp.exe"
-                        Arguments = ""
-                        Description = "TestApp Shortcut"
+                return [PSCustomObject]@{
+                    CreateShortcut = {
+                        param($Path)
+                        Write-Host "Mock CreateShortcut appelé pour Path: $Path"
+                        Write-Host "Retour de TargetPath: C:\Program Files\TestApp\TestApp.exe"
+                        return [PSCustomObject]@{
+                            TargetPath = "C:\Program Files\TestApp\TestApp.exe"
+                            Arguments = ""
+                            Description = "TestApp Shortcut"
+                        }
                     }
                 }
-                $shell | Add-Member -MemberType ScriptMethod -Name CreateShortcut -Value $createShortcutMethod -Force
-                return $shell
             } else {
                 Write-Host "Appel New-Object original avec TypeName: '$TypeName', ComObject: '$ComObject'"
                 if ($ComObject) {

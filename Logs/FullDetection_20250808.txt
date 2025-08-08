@@ -1,0 +1,109 @@
+[2025-08-08 20:07:40] [Info] Configuration mise à jour
+[2025-08-08 20:07:40] [Info] Début détection logiciels via raccourcis
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Lenovo Service Bridge
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : PowerToys
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Python
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Microsoft OneNote
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Intel(R) Processor Identification Utility
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : 4K Video Downloader+
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : 4K YouTube to MP3
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Adlice Protect
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : AirDroid
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : BlueStacks Services
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Captvty
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : BlueStacks
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Visual Studio Code
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Cozy Drive
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Everything
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : files-preview
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Firefox
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Firefox
+[2025-08-08 20:07:41] [Debug] Logiciel ajouté : Flow Launcher
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : Ketarin
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : LocalSend
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : Opera Internet Browser
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : O&O DeskInfo
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : Perplexity
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : PortableApps.com Platform
+[2025-08-08 20:07:42] [Debug] Logiciel ajouté : RAC Pcloud
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Rapr
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Sucrose Wallpaper Engine
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Telegram Desktop
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : 7-Zip
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Windows Media Player Legacy
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Registry Editor
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : BlueStacks Store
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Canon IJ Scan Utility
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : HP Digital Imaging
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Lenovo System Update
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Thunderbolt(TM) Software
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Node.js
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : NVIDIA RTX Experience
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Microsoft Office
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : Home Updater
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : PowerShell
+[2025-08-08 20:07:43] [Debug] Logiciel ajouté : SteelSeries GG
+[2025-08-08 20:07:43] [Info] Détection raccourcis terminée : 43 logiciels trouvés
+[2025-08-08 20:20:09] [Info] Configuration mise à jour
+[2025-08-08 20:20:10] [Info] === DÉBUT DÉTECTION COMPLÈTE ===
+[2025-08-08 20:20:10] [Info] Options : Installés=True, Portables=True, Raccourcis=True
+[2025-08-08 20:20:10] [Info] --- Phase 1 : Logiciels installés ---
+[2025-08-08 20:20:11] [Info] Début détection logiciels installés
+[2025-08-08 20:20:12] [Info] Détection installés terminée : 64 logiciels trouvés
+[2025-08-08 20:20:12] [Info] Phase 1 terminée : 64 logiciels installés
+[2025-08-08 20:20:12] [Info] --- Phase 2 : Logiciels portables ---
+[2025-08-08 20:20:12] [Info] Début détection logiciels portables
+[2025-08-08 20:20:12] [Info] Détection portables terminée : 0 logiciels trouvés
+[2025-08-08 20:20:12] [Info] Phase 2 terminée : 0 logiciels portables
+[2025-08-08 20:20:12] [Info] --- Phase 3 : Raccourcis ---
+[2025-08-08 20:20:12] [Info] Début détection logiciels via raccourcis
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : Lenovo Service Bridge
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : PowerToys
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : Python
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : Microsoft OneNote
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : Intel(R) Processor Identification Utility
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : 4K Video Downloader+
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : 4K YouTube to MP3
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : Adlice Protect
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : AirDroid
+[2025-08-08 20:20:12] [Debug] Logiciel ajouté : BlueStacks Services
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Captvty
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : BlueStacks
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Visual Studio Code
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Cozy Drive
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Everything
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : files-preview
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Firefox
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Firefox
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Flow Launcher
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Ketarin
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : LocalSend
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Opera Internet Browser
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : O&O DeskInfo
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : Perplexity
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : PortableApps.com Platform
+[2025-08-08 20:20:13] [Debug] Logiciel ajouté : RAC Pcloud
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : Rapr
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : Sucrose Wallpaper Engine
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : Telegram Desktop
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : 7-Zip
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : Windows Media Player Legacy
+[2025-08-08 20:20:14] [Debug] Logiciel ajouté : Registry Editor
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : BlueStacks Store
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Canon IJ Scan Utility
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : HP Digital Imaging
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Lenovo System Update
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Thunderbolt(TM) Software
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Node.js
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : NVIDIA RTX Experience
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Microsoft Office
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : Home Updater
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : PowerShell
+[2025-08-08 20:20:15] [Debug] Logiciel ajouté : SteelSeries GG
+[2025-08-08 20:20:15] [Info] Détection raccourcis terminée : 43 logiciels trouvés
+[2025-08-08 20:20:15] [Info] Phase 3 terminée : 43 raccourcis
+[2025-08-08 20:20:15] [Info] --- Phase 4 : Dédoublonnage ---
+[2025-08-08 20:20:15] [Info] === DÉTECTION TERMINÉE ===
+[2025-08-08 20:20:15] [Info] Total brut : 107 éléments
+[2025-08-08 20:20:15] [Info] Total unique : 106 logiciels
+[2025-08-08 20:20:15] [Info] Durée : 4.23 secondes

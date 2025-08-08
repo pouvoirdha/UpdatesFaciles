@@ -8,10 +8,10 @@
     Conforme aux exigences UpdatesFaciles_Prompt.txt
 .NOTES
     Fichier : Sources/SoftwareDetection.psm1
-    Version : 3.0
+    Version : 3.3
     Auteur : UpdatesFaciles Team
-    Date : 2025-08-08
-    Notes : Correction mock CreateShortcut pour Get-ShortcutSoftware, gestion conditionnelle ReleaseComObject
+    Date : 2025-08-07
+    Notes : Correction absence Get-ShortcutSoftware, suppression doublon Get-PortableSoftware, amélioration déduplication, correction journalisation fonctions
 #>
 
 # Vérification des dépendances
@@ -21,8 +21,7 @@ if (-not (Test-Path P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1)) {
 }
 Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1 -Force
 
-$Script:ModuleVersion = "3.0"
-Write-Host "Module SoftwareDetection chargé - Version $Script:ModuleVersion" -ForegroundColor Green
+Write-Host "Module SoftwareDetection chargé - Version 3.3" -ForegroundColor Green
 
 # =============================================================================
 # VARIABLES GLOBALES ET CONFIGURATION
@@ -36,7 +35,6 @@ $Script:DetectionConfig = @{
     EnableUpdateCheck = $true
     DebugMode = $false
 }
-$Script:LogBuffer = [System.Collections.ArrayList]::new()
 
 $Script:StandardPaths = @{
     ProgramFiles = @(
@@ -68,17 +66,21 @@ $Script:RegistryPaths = @(
 function Write-DetectionLog {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$Message,
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("Info", "Debug", "Error")]
-        [string]$Level
+        [ValidateSet("Info", "Warning", "Error", "Debug")]
+        [string]$Level = "Info"
     )
+    
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] $Message"
-    $null = $Script:LogBuffer.Add($logEntry)
-    if ($Level -eq "Debug" -and -not $Script:DetectionConfig.DebugMode) { return }
-    if ($Level -eq "Error") { Write-Error $logEntry } elseif ($Level -eq "Debug") { Write-Debug $logEntry } else { Write-Host $logEntry }
+    $logMessage = "[$timestamp] [$Level] $Message"
+    
+    switch ($Level) {
+        "Info" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor White } }
+        "Warning" { Write-Warning $logMessage }
+        "Error" { Write-Error $logMessage }
+        "Debug" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor Cyan } }
+    }
 }
 
 function Test-PathSafely {
@@ -296,39 +298,27 @@ function Get-ShortcutSoftware {
         Write-DetectionLog "Détection raccourcis désactivée" "Info"
         return @()
     }
-
+    
     Write-DetectionLog "Début détection logiciels via raccourcis" "Info"
     $shortcutSoftware = @()
-    $seenSoftware = @{}  # Pour suivre les logiciels uniques basés sur TargetPath
-
+    
     try {
-        Write-DetectionLog "Tentative de création de l'objet COM WScript.Shell" "Debug"
-        $shell = New-Object -ComObject WScript.Shell -ErrorAction Stop
+        $shell = New-Object -ComObject WScript.Shell
         Write-DetectionLog "Objet WScript.Shell créé (Type: $($shell.GetType().FullName))" "Debug"
     }
     catch {
         Write-DetectionLog "Impossible de créer l'objet WScript.Shell : $($_.Exception.Message)" "Error"
         return @()
     }
-
-    # Dossiers système à exclure
-    $systemFolders = @(
-        "C:\Windows",
-        "C:\Windows\System32",
-        "C:\Windows\SysWOW64"
-    )
-
-    # Termes à exclure dans les noms de raccourcis
-    $excludeTerms = @("Uninstall", "Désinstaller", "Help", "Aide", "Manual", "Documentation", "Manuals")
-
+    
     foreach ($location in $Script:StandardPaths.Shortcuts.Values) {
         if (-not (Test-PathSafely $location)) {
             Write-DetectionLog "Dossier raccourcis inexistant : $location" "Debug"
             continue
         }
-
+        
         Write-DetectionLog "Scan raccourcis : $location" "Debug"
-
+        
         try {
             $shortcuts = Get-ChildItem -Path $location -Recurse -Include "*.lnk" -ErrorAction SilentlyContinue |
                 Select-Object -First 50
@@ -338,62 +328,41 @@ function Get-ShortcutSoftware {
             Write-DetectionLog "Erreur scan raccourcis $location : $($_.Exception.Message)" "Error"
             continue
         }
-
+        
         foreach ($shortcut in $shortcuts) {
-            # Ignorer les raccourcis de désinstallation ou d'aide
-            if ($excludeTerms | Where-Object { $shortcut.BaseName -match $_ }) {
-                Write-DetectionLog "Raccourci ignoré (nom indésirable) : $($shortcut.FullName)" "Debug"
-                continue
-            }
-
             Write-DetectionLog "Traitement raccourci : $($shortcut.FullName)" "Debug"
             try {
                 $link = $shell.CreateShortcut($shortcut.FullName)
                 Write-DetectionLog "Shortcut créé pour : $($shortcut.FullName)" "Debug"
                 $targetPath = $link.TargetPath
                 Write-DetectionLog "TargetPath brut : '$targetPath'" "Debug"
-
+                
                 if ([string]::IsNullOrWhiteSpace($targetPath)) {
                     Write-DetectionLog "TargetPath est vide ou null pour $($shortcut.FullName)" "Debug"
                     continue
                 }
-
+                
                 if (-not (Test-PathSafely $targetPath)) {
                     Write-DetectionLog "TargetPath n'existe pas : $targetPath" "Debug"
                     continue
                 }
-
+                
                 if (-not ($targetPath -match "\.exe$")) {
                     Write-DetectionLog "TargetPath n'est pas un exécutable : $targetPath" "Debug"
                     continue
                 }
-
-                # Exclure les exécutables dans les dossiers système
-                $parentPath = Split-Path $targetPath -Parent
-                if ($systemFolders | Where-Object { $parentPath -like "$_\*" }) {
-                    Write-DetectionLog "TargetPath dans dossier système ignoré : $targetPath" "Debug"
-                    continue
-                }
-
+                
                 Write-DetectionLog "TargetPath valide : $targetPath" "Debug"
-
-                # Déduplication basée sur TargetPath
-                if ($seenSoftware.ContainsKey($targetPath)) {
-                    Write-DetectionLog "Logiciel dupliqué ignoré (même TargetPath) : $targetPath" "Debug"
-                    continue
-                }
-                $seenSoftware[$targetPath] = $true
-
                 $versionInfo = Get-FileVersionSafely $targetPath
                 Write-DetectionLog "VersionInfo : $($versionInfo | ConvertTo-Json -Depth 2)" "Debug"
-
-                $name = if ($versionInfo -and $versionInfo.ProductName -and $versionInfo.ProductName -notmatch "Microsoft.*Windows") { 
+                
+                $name = if ($versionInfo -and $versionInfo.ProductName) { 
                     $versionInfo.ProductName 
                 } else { 
                     $shortcut.BaseName 
                 }
                 Write-DetectionLog "Nom détecté : $name" "Debug"
-
+                
                 $version = if ($versionInfo -and $versionInfo.ProductVersion) { 
                     $versionInfo.ProductVersion 
                 } else { 
@@ -404,15 +373,15 @@ function Get-ShortcutSoftware {
                 } else { 
                     "Inconnu" 
                 }
-
+                
                 $software = New-SoftwareApp -Name $name `
-                                           -Version $version `
-                                           -Publisher $publisher `
-                                           -Path (Split-Path $targetPath -Parent) `
-                                           -Source "Raccourci" `
-                                           -State "Inconnu"
+                                          -Version $version `
+                                          -Publisher $publisher `
+                                          -Path (Split-Path $targetPath -Parent) `
+                                          -Source "Raccourci" `
+                                          -State "Inconnu"
                 Write-DetectionLog "Logiciel ajouté : $($software.Name)" "Debug"
-
+                
                 $shortcutSoftware += $software
             }
             catch {
@@ -420,26 +389,15 @@ function Get-ShortcutSoftware {
             }
         }
     }
-
+    
     try {
-        if ($shell -is [System.__ComObject]) {
-            Write-DetectionLog "Tentative de libération de l'objet COM WScript.Shell" "Debug"
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($shell) | Out-Null
-            Write-DetectionLog "Objet COM libéré" "Debug"
-        } else {
-            Write-DetectionLog "Objet n'est pas un COM object, pas de libération nécessaire" "Debug"
-        }
+        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($shell) | Out-Null
+        Write-DetectionLog "Objet COM libéré" "Debug"
     }
     catch {
         Write-DetectionLog "Erreur nettoyage objet COM : $($_.Exception.Message)" "Debug"
     }
-
-    # Exporter les logs en JSON
-    $logEntries = Get-DetectionLog
-    if ($logEntries) {
-        $logEntries | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-    }
-
+    
     Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
     return $shortcutSoftware
 }
@@ -523,11 +481,6 @@ function Invoke-SoftwareDetection {
         Write-DetectionLog "Total brut : $($allSoftware.Count) éléments" "Info"
         Write-DetectionLog "Total unique : $($uniqueSoftware.Count) logiciels" "Info"
         Write-DetectionLog "Durée : $([math]::Round($stopwatch.Elapsed.TotalSeconds, 2)) secondes" "Info"
-        
-        # Export des logiciels uniques en JSON
-        if ($uniqueSoftware) {
-            $uniqueSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-        }
         
         return $uniqueSoftware
     }
@@ -638,12 +591,6 @@ function Get-DetectionConfig {
     return $Script:DetectionConfig
 }
 
-function Get-DetectionLog {
-    [CmdletBinding()]
-    param()
-    return $Script:LogBuffer
-}
-
 # =============================================================================
 # EXPORT DES FONCTIONS
 # =============================================================================
@@ -656,8 +603,7 @@ Export-ModuleMember -Function @(
     'Set-DetectionConfig',
     'Get-DetectionConfig',
     'Remove-DuplicateSoftware',
-    'Enable-CloudSyncDetection',
-    'Get-DetectionLog'
+    'Enable-CloudSyncDetection'
 )
 
 Write-Host "Fonctions disponibles : $(Get-Command -Module SoftwareDetection | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue)" -ForegroundColor Green

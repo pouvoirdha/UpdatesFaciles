@@ -8,10 +8,10 @@
     Conforme aux exigences UpdatesFaciles_Prompt.txt
 .NOTES
     Fichier : Sources/SoftwareDetection.psm1
-    Version : 3.0
+    Version : 3.3
     Auteur : UpdatesFaciles Team
-    Date : 2025-08-08
-    Notes : Correction mock CreateShortcut pour Get-ShortcutSoftware, gestion conditionnelle ReleaseComObject
+    Date : 2025-07-30
+    Notes : Correction Source (Registry->Installé, Shortcut->Raccourci), State (Detected->Inconnu), ajout Enable-CloudSyncDetection, CloudSync vidé
 #>
 
 # Vérification des dépendances
@@ -20,9 +20,6 @@ if (-not (Test-Path P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1)) {
     return
 }
 Import-Module P:\Git\UpdatesFaciles\Sources\SoftwareApp.psm1 -Force
-
-$Script:ModuleVersion = "3.0"
-Write-Host "Module SoftwareDetection chargé - Version $Script:ModuleVersion" -ForegroundColor Green
 
 # =============================================================================
 # VARIABLES GLOBALES ET CONFIGURATION
@@ -36,7 +33,6 @@ $Script:DetectionConfig = @{
     EnableUpdateCheck = $true
     DebugMode = $false
 }
-$Script:LogBuffer = [System.Collections.ArrayList]::new()
 
 $Script:StandardPaths = @{
     ProgramFiles = @(
@@ -61,6 +57,8 @@ $Script:RegistryPaths = @(
     "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 )
 
+Write-Host "Module SoftwareDetection chargé - Version 3.3" -ForegroundColor Green
+
 # =============================================================================
 # FONCTIONS UTILITAIRES
 # =============================================================================
@@ -68,17 +66,21 @@ $Script:RegistryPaths = @(
 function Write-DetectionLog {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$Message,
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("Info", "Debug", "Error")]
-        [string]$Level
+        [ValidateSet("Info", "Warning", "Error", "Debug")]
+        [string]$Level = "Info"
     )
+    
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] $Message"
-    $null = $Script:LogBuffer.Add($logEntry)
-    if ($Level -eq "Debug" -and -not $Script:DetectionConfig.DebugMode) { return }
-    if ($Level -eq "Error") { Write-Error $logEntry } elseif ($Level -eq "Debug") { Write-Debug $logEntry } else { Write-Host $logEntry }
+    $logMessage = "[$timestamp] [$Level] $Message"
+    
+    switch ($Level) {
+        "Info" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor White } }
+        "Warning" { Write-Warning $logMessage }
+        "Error" { Write-Error $logMessage }
+        "Debug" { if ($Script:DetectionConfig.DebugMode) { Write-Host $logMessage -ForegroundColor Cyan } }
+    }
 }
 
 function Test-PathSafely {
@@ -214,28 +216,18 @@ function Get-PortableSoftware {
                     $_.Directory.Name -notmatch "^(temp|cache|logs?|backup|unins)" -and
                     $_.Name -notmatch "^(unins|setup|install)" 
                 } |
-                Group-Object -Property DirectoryName |
+                Group-Object -Property DirectoryName | # Grouper par dossier
                 ForEach-Object {
-                    $_.Group | Sort-Object {
+                    # Sélectionner un seul exécutable par dossier, en préférant celui avec la version la plus récente
+                    $_.Group | Sort-Object { 
                         $versionInfo = Get-FileVersionSafely $_.FullName
-                        $versionString = if ($versionInfo -and $versionInfo.ProductVersion) {
-                            $versionInfo.ProductVersion
+                        if ($versionInfo -and $versionInfo.ProductVersion) {
+                            [Version]::Parse(($versionInfo.ProductVersion -replace '[^\d.]', ''))
                         } else {
-                            "0.0"
-                        }
-                        try {
-                            [Version]::Parse(($versionString -replace '[^\d.]', ''))
-                        } catch {
-                            Write-DetectionLog "Version invalide pour $($_.FullName) : $versionString" "Debug"
                             [Version]::new(0,0)
                         }
                     } -Descending | Select-Object -First 1
                 }
-            
-            if (-not $executables) {
-                Write-DetectionLog "Aucun exécutable trouvé dans $basePath" "Debug"
-                continue
-            }
             
             foreach ($exe in $executables) {
                 try {
@@ -288,160 +280,100 @@ function Get-PortableSoftware {
 # DÉTECTION RACCOURCIS
 # =============================================================================
 
-function Get-ShortcutSoftware {
+function Get-PortableSoftware {
     [CmdletBinding()]
-    param()
-    
-    if (-not $Script:DetectionConfig.EnableShortcutDetection) {
-        Write-DetectionLog "Détection raccourcis désactivée" "Info"
-        return @()
-    }
-
-    Write-DetectionLog "Début détection logiciels via raccourcis" "Info"
-    $shortcutSoftware = @()
-    $seenSoftware = @{}  # Pour suivre les logiciels uniques basés sur TargetPath
-
-    try {
-        Write-DetectionLog "Tentative de création de l'objet COM WScript.Shell" "Debug"
-        $shell = New-Object -ComObject WScript.Shell -ErrorAction Stop
-        Write-DetectionLog "Objet WScript.Shell créé (Type: $($shell.GetType().FullName))" "Debug"
-    }
-    catch {
-        Write-DetectionLog "Impossible de créer l'objet WScript.Shell : $($_.Exception.Message)" "Error"
-        return @()
-    }
-
-    # Dossiers système à exclure
-    $systemFolders = @(
-        "C:\Windows",
-        "C:\Windows\System32",
-        "C:\Windows\SysWOW64"
+    param(
+        [string[]]$CustomPaths = @()
     )
-
-    # Termes à exclure dans les noms de raccourcis
-    $excludeTerms = @("Uninstall", "Désinstaller", "Help", "Aide", "Manual", "Documentation", "Manuals")
-
-    foreach ($location in $Script:StandardPaths.Shortcuts.Values) {
-        if (-not (Test-PathSafely $location)) {
-            Write-DetectionLog "Dossier raccourcis inexistant : $location" "Debug"
+    
+    if (-not $Script:DetectionConfig.EnablePortableDetection) {
+        Write-DetectionLog "Détection portable désactivée" "Info"
+        return @()
+    }
+    
+    Write-DetectionLog "Début détection logiciels portables" "Info"
+    $portableSoftware = @()
+    
+    $allPaths = $Script:StandardPaths.PortableApps + $Script:StandardPaths.CloudSync + $CustomPaths
+    
+    foreach ($basePath in $allPaths) {
+        if (-not (Test-PathSafely $basePath)) {
+            Write-DetectionLog "Chemin portable inexistant : $basePath" "Debug"
             continue
         }
-
-        Write-DetectionLog "Scan raccourcis : $location" "Debug"
-
+        
+        Write-DetectionLog "Scan dossier portable : $basePath" "Debug"
+        
         try {
-            $shortcuts = Get-ChildItem -Path $location -Recurse -Include "*.lnk" -ErrorAction SilentlyContinue |
-                Select-Object -First 50
-            Write-DetectionLog "Raccourcis trouvés dans $location : $($shortcuts.Count)" "Debug"
+            $executables = Get-ChildItem -Path $basePath -Recurse -Include "*.exe" -ErrorAction SilentlyContinue |
+                Where-Object { 
+                    $_.Directory.Name -notmatch "^(temp|cache|logs?|backup|unins)" -and
+                    $_.Name -notmatch "^(unins|setup|install)" 
+                } |
+                Group-Object -Property DirectoryName |
+                ForEach-Object {
+                    # Sélectionner un seul exécutable par dossier, en préférant celui avec la version la plus récente
+                    $_.Group | Sort-Object {
+                        $versionInfo = Get-FileVersionSafely $_.FullName
+                        $versionString = if ($versionInfo -and $versionInfo.ProductVersion) {
+                            $versionInfo.ProductVersion
+                        } else {
+                            "0.0"
+                        }
+                        try {
+                            [Version]::Parse(($versionString -replace '[^\d.]', ''))
+                        } catch {
+                            Write-DetectionLog "Version invalide pour $($_.FullName) : $versionString" "Debug"
+                            [Version]::new(0,0)
+                        }
+                    } -Descending | Select-Object -First 1
+                }
+            
+            foreach ($exe in $executables) {
+                try {
+                    $versionInfo = Get-FileVersionSafely $exe.FullName
+                    
+                    $name = if ($versionInfo -and $versionInfo.ProductName) { 
+                        $versionInfo.ProductName 
+                    } else { 
+                        $exe.BaseName 
+                    }
+                    
+                    $version = if ($versionInfo -and $versionInfo.ProductVersion) { 
+                        $versionInfo.ProductVersion 
+                    } else { 
+                        "Inconnu" 
+                    }
+                    
+                    $publisher = if ($versionInfo -and $versionInfo.CompanyName) { 
+                        $versionInfo.CompanyName 
+                    } else { 
+                        "Inconnu" 
+                    }
+                    
+                    $sourceType = if ($basePath -match "(OneDrive|Google Drive|Dropbox)") { "Cloud" } else { "Portable" }
+                    
+                    $software = New-SoftwareApp -Name $name `
+                                              -Version $version `
+                                              -Publisher $publisher `
+                                              -Path $exe.DirectoryName `
+                                              -Source $sourceType `
+                                              -State "Inconnu"
+                    
+                    $portableSoftware += $software
+                }
+                catch {
+                    Write-DetectionLog "Erreur traitement portable $($exe.FullName) : $($_.Exception.Message)" "Debug"
+                }
+            }
         }
         catch {
-            Write-DetectionLog "Erreur scan raccourcis $location : $($_.Exception.Message)" "Error"
-            continue
-        }
-
-        foreach ($shortcut in $shortcuts) {
-            # Ignorer les raccourcis de désinstallation ou d'aide
-            if ($excludeTerms | Where-Object { $shortcut.BaseName -match $_ }) {
-                Write-DetectionLog "Raccourci ignoré (nom indésirable) : $($shortcut.FullName)" "Debug"
-                continue
-            }
-
-            Write-DetectionLog "Traitement raccourci : $($shortcut.FullName)" "Debug"
-            try {
-                $link = $shell.CreateShortcut($shortcut.FullName)
-                Write-DetectionLog "Shortcut créé pour : $($shortcut.FullName)" "Debug"
-                $targetPath = $link.TargetPath
-                Write-DetectionLog "TargetPath brut : '$targetPath'" "Debug"
-
-                if ([string]::IsNullOrWhiteSpace($targetPath)) {
-                    Write-DetectionLog "TargetPath est vide ou null pour $($shortcut.FullName)" "Debug"
-                    continue
-                }
-
-                if (-not (Test-PathSafely $targetPath)) {
-                    Write-DetectionLog "TargetPath n'existe pas : $targetPath" "Debug"
-                    continue
-                }
-
-                if (-not ($targetPath -match "\.exe$")) {
-                    Write-DetectionLog "TargetPath n'est pas un exécutable : $targetPath" "Debug"
-                    continue
-                }
-
-                # Exclure les exécutables dans les dossiers système
-                $parentPath = Split-Path $targetPath -Parent
-                if ($systemFolders | Where-Object { $parentPath -like "$_\*" }) {
-                    Write-DetectionLog "TargetPath dans dossier système ignoré : $targetPath" "Debug"
-                    continue
-                }
-
-                Write-DetectionLog "TargetPath valide : $targetPath" "Debug"
-
-                # Déduplication basée sur TargetPath
-                if ($seenSoftware.ContainsKey($targetPath)) {
-                    Write-DetectionLog "Logiciel dupliqué ignoré (même TargetPath) : $targetPath" "Debug"
-                    continue
-                }
-                $seenSoftware[$targetPath] = $true
-
-                $versionInfo = Get-FileVersionSafely $targetPath
-                Write-DetectionLog "VersionInfo : $($versionInfo | ConvertTo-Json -Depth 2)" "Debug"
-
-                $name = if ($versionInfo -and $versionInfo.ProductName -and $versionInfo.ProductName -notmatch "Microsoft.*Windows") { 
-                    $versionInfo.ProductName 
-                } else { 
-                    $shortcut.BaseName 
-                }
-                Write-DetectionLog "Nom détecté : $name" "Debug"
-
-                $version = if ($versionInfo -and $versionInfo.ProductVersion) { 
-                    $versionInfo.ProductVersion 
-                } else { 
-                    "Inconnu" 
-                }
-                $publisher = if ($versionInfo -and $versionInfo.CompanyName) { 
-                    $versionInfo.CompanyName 
-                } else { 
-                    "Inconnu" 
-                }
-
-                $software = New-SoftwareApp -Name $name `
-                                           -Version $version `
-                                           -Publisher $publisher `
-                                           -Path (Split-Path $targetPath -Parent) `
-                                           -Source "Raccourci" `
-                                           -State "Inconnu"
-                Write-DetectionLog "Logiciel ajouté : $($software.Name)" "Debug"
-
-                $shortcutSoftware += $software
-            }
-            catch {
-                Write-DetectionLog "Erreur traitement raccourci $($shortcut.FullName) : $($_.Exception.Message)" "Debug"
-            }
+            Write-DetectionLog "Erreur scan dossier $basePath : $($_.Exception.Message)" "Error"
         }
     }
-
-    try {
-        if ($shell -is [System.__ComObject]) {
-            Write-DetectionLog "Tentative de libération de l'objet COM WScript.Shell" "Debug"
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($shell) | Out-Null
-            Write-DetectionLog "Objet COM libéré" "Debug"
-        } else {
-            Write-DetectionLog "Objet n'est pas un COM object, pas de libération nécessaire" "Debug"
-        }
-    }
-    catch {
-        Write-DetectionLog "Erreur nettoyage objet COM : $($_.Exception.Message)" "Debug"
-    }
-
-    # Exporter les logs en JSON
-    $logEntries = Get-DetectionLog
-    if ($logEntries) {
-        $logEntries | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-    }
-
-    Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
-    return $shortcutSoftware
+    
+    Write-DetectionLog "Détection portables terminée : $($portableSoftware.Count) logiciels trouvés" "Info"
+    return $portableSoftware
 }
 
 # =============================================================================
@@ -524,11 +456,6 @@ function Invoke-SoftwareDetection {
         Write-DetectionLog "Total unique : $($uniqueSoftware.Count) logiciels" "Info"
         Write-DetectionLog "Durée : $([math]::Round($stopwatch.Elapsed.TotalSeconds, 2)) secondes" "Info"
         
-        # Export des logiciels uniques en JSON
-        if ($uniqueSoftware) {
-            $uniqueSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-        }
-        
         return $uniqueSoftware
     }
     catch {
@@ -566,39 +493,20 @@ function Remove-DuplicateSoftware {
                 continue
             }
             
-            # Créer une clé unique basée sur Name, Version, et Publisher
-            $key = "$($software.Name)-$($software.Version)-$($software.Publisher)"
+            # Créer une clé unique basée sur Name, Version, Publisher, et Path
+            $key = "$($software.Name)-$($software.Version)-$($software.Publisher)-$($software.Path)"
             
             if (-not $seen.ContainsKey($key)) {
-                # Préférer la source dans l'ordre : Installé > Raccourci > Portable > Cloud
-                $sourcePriority = @{
-                    "Installé" = 4
-                    "Raccourci" = 3
-                    "Portable" = 2
-                    "Cloud" = 1
-                }
-                $software | Add-Member -MemberType NoteProperty -Name SourcePriority -Value ($sourcePriority[$software.Source] ? $sourcePriority[$software.Source] : 0) -Force
-                $seen[$key] = $software
+                # Ajouter le logiciel seulement s'il n'a pas été vu
+                $seen[$key] = $true
+                $uniqueSoftware += $software
             } else {
-                # Si doublon, garder celui avec la priorité de source la plus élevée
-                $existing = $seen[$key]
-                $existingPriority = $existing.SourcePriority ? $existing.SourcePriority : 0
-                $newPriority = $sourcePriority[$software.Source] ? $sourcePriority[$software.Source] : 0
-                if ($newPriority -gt $existingPriority) {
-                    $software | Add-Member -MemberType NoteProperty -Name SourcePriority -Value $newPriority -Force
-                    $seen[$key] = $software
-                }
-                Write-DetectionLog "Doublon détecté : $($software.Name) (Version: $($software.Version), Source: $($software.Source), Path: $($software.Path))" "Debug"
+                Write-DetectionLog "Doublon détecté : $($software.Name) (Version: $($software.Version), Path: $($software.Path))" "Debug"
             }
         }
         catch {
             Write-DetectionLog "Erreur dédoublonnage élément '$($software.Name)' : $($_.Exception.Message)" "Error"
         }
-    }
-    
-    $uniqueSoftware = $seen.Values | Sort-Object { $_.SourcePriority } -Descending | ForEach-Object {
-        $_.PSObject.Properties.Remove('SourcePriority')
-        $_
     }
     
     Write-DetectionLog "Dédoublonnage terminé : $($uniqueSoftware.Count) logiciels uniques" "Debug"
@@ -638,12 +546,6 @@ function Get-DetectionConfig {
     return $Script:DetectionConfig
 }
 
-function Get-DetectionLog {
-    [CmdletBinding()]
-    param()
-    return $Script:LogBuffer
-}
-
 # =============================================================================
 # EXPORT DES FONCTIONS
 # =============================================================================
@@ -656,8 +558,5 @@ Export-ModuleMember -Function @(
     'Set-DetectionConfig',
     'Get-DetectionConfig',
     'Remove-DuplicateSoftware',
-    'Enable-CloudSyncDetection',
-    'Get-DetectionLog'
+    'Enable-CloudSyncDetection'
 )
-
-Write-Host "Fonctions disponibles : $(Get-Command -Module SoftwareDetection | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue)" -ForegroundColor Green

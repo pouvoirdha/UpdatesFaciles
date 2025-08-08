@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+7#Requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -36,7 +36,7 @@ $Script:DetectionConfig = @{
     EnableUpdateCheck = $true
     DebugMode = $false
 }
-$Script:LogBuffer = [System.Collections.ArrayList]::new()
+$Script:LogBuffer = @()
 
 $Script:StandardPaths = @{
     ProgramFiles = @(
@@ -66,7 +66,6 @@ $Script:RegistryPaths = @(
 # =============================================================================
 
 function Write-DetectionLog {
-    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message,
@@ -74,11 +73,12 @@ function Write-DetectionLog {
         [ValidateSet("Info", "Debug", "Error")]
         [string]$Level
     )
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] $Message"
-    $null = $Script:LogBuffer.Add($logEntry)
-    if ($Level -eq "Debug" -and -not $Script:DetectionConfig.DebugMode) { return }
-    if ($Level -eq "Error") { Write-Error $logEntry } elseif ($Level -eq "Debug") { Write-Debug $logEntry } else { Write-Host $logEntry }
+    if ($Level -eq "Debug" -and $Message -notmatch "Logiciel ajouté") {
+        if (-not $Script:DetectionConfig.DebugMode) { return }
+    }
+    $logEntry = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [$Level] $Message"
+    $Script:LogBuffer += $logEntry
+    Write-Host $logEntry
 }
 
 function Test-PathSafely {
@@ -291,7 +291,7 @@ function Get-PortableSoftware {
 function Get-ShortcutSoftware {
     [CmdletBinding()]
     param()
-    
+
     if (-not $Script:DetectionConfig.EnableShortcutDetection) {
         Write-DetectionLog "Détection raccourcis désactivée" "Info"
         return @()
@@ -436,9 +436,7 @@ function Get-ShortcutSoftware {
 
     # Exporter les logs en JSON
     $logEntries = Get-DetectionLog
-    if ($logEntries) {
-        $logEntries | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-    }
+    $logEntries | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\ShortcutDetection_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
 
     Write-DetectionLog "Détection raccourcis terminée : $($shortcutSoftware.Count) logiciels trouvés" "Info"
     return $shortcutSoftware
@@ -525,9 +523,7 @@ function Invoke-SoftwareDetection {
         Write-DetectionLog "Durée : $([math]::Round($stopwatch.Elapsed.TotalSeconds, 2)) secondes" "Info"
         
         # Export des logiciels uniques en JSON
-        if ($uniqueSoftware) {
-            $uniqueSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-        }
+        $uniqueSoftware | ConvertTo-Json -Depth 3 | Out-File -FilePath "P:\Git\UpdatesFaciles\Logs\SoftwareList_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
         
         return $uniqueSoftware
     }
@@ -638,12 +634,6 @@ function Get-DetectionConfig {
     return $Script:DetectionConfig
 }
 
-function Get-DetectionLog {
-    [CmdletBinding()]
-    param()
-    return $Script:LogBuffer
-}
-
 # =============================================================================
 # EXPORT DES FONCTIONS
 # =============================================================================
@@ -661,3 +651,9 @@ Export-ModuleMember -Function @(
 )
 
 Write-Host "Fonctions disponibles : $(Get-Command -Module SoftwareDetection | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue)" -ForegroundColor Green
+
+function Get-DetectionLog {
+    [CmdletBinding()]
+    param()
+    return $Script:LogBuffer
+}
